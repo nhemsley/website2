@@ -1,0 +1,80 @@
+skills:
+  languages:
+    - name: Ruby
+      level: advanced
+      yearsExperience: 15
+    - name: Rust
+      level: intermediate
+      yearsExperience: 3
+    - name: JavaScript
+      level: advanced
+      yearsExperience: 15
+    - name: PHP
+      level: intermediate
+      yearsExperience: 10
+    - name: Python
+      level: intermediate
+      yearsExperience: 5
+    - name: C#
+      level: intermediate
+      yearsExperience: 3
+
+  frameworks:
+    - name: Ruby on Rails
+      level: advanced
+    - name: Vue.js
+      level: intermediate
+    - name: React
+      level: intermediate
+    - name: Bevy
+      level: beginner
+    - name: Three.js
+      level: beginner
+
+  databases:
+    - name: PostgreSQL
+      level: advanced
+    - name: MySQL
+      level: advanced
+    - name: PostGIS
+      level: intermediate
+
+  devops:
+    - name: Docker
+      level: intermediate
+    - name: Kubernetes
+      level: beginner
+    - name: AWS
+      level: intermediate
+    - name: Terraform
+      level: beginner
+    - name: Google Cloud Platform
+      level: beginner
+
+  specialties:
+    - name: Test-Driven Development
+      level: advanced
+    - name: Full-Stack Web Development
+      level: advanced
+    - name: API Integration
+      level: advanced
+    - name: Spatial Computing / GIS
+      level: intermediate
+    - name: 3D Graphics
+      level: beginner
+    - name: Game Development
+      level: beginner
+    - name: Scientific Computing
+      level: beginner
+
+  other:
+    - Elasticsearch
+    - Redis
+    - Google APIs (Places, Drive, etc.)
+    - JSON APIs
+    - CSS / SASS
+    - HTML
+    - Git
+    - Linux Administration
+    - cPanel / WHM
+    - Stripe Payment Integration

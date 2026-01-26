@@ -1,0 +1,15 @@
+personal:
+  fullName: Nicholas Hemsley
+  titles:
+    - Computer Scientist
+    - Data Scientist
+  contact:
+    email: nick.hems@gmail.com
+    phone: "+61 497 686 384"
+  location:
+    city: Perth
+    state: Western Australia
+    country: Australia
+  social:
+    github: nhemsley
+    linkedin: ""
