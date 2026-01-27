@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 1600">
+  <defs>
+    <style>
+      .tech-symbol { overflow: visible; }
+      .tech-label { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; fill: #333; }
+      .tech-badge { display: none; }
+      .tech-symbol[data-proficiency="9"] .tech-badge { display: inline; fill: #f39c12; }
+      .tech-symbol[data-proficiency="8"] .tech-badge { display: inline; fill: #3498db; }
+      .tech-symbol[data-proficiency="7"] .tech-badge { display: inline; fill: #2ecc71; }
+      .tech-symbol[data-proficiency="6"] .tech-badge { display: inline; fill: #9b59b6; }
+    </style>
+  </defs>
+
+  <!-- BACKEND TECHNOLOGIES -->
+  <g id="technologies">
+
+    <!-- Ruby -->
+    <g class="tech-symbol" id="ruby" data-name="Ruby" data-category="backend" data-proficiency="9" data-years="15" data-tags="language">
+      <circle cx="50" cy="50" r="40" fill="#cc342d" opacity="0.1" stroke="#cc342d" stroke-width="2"/>
+      <text class="tech-label" x="50" y="60" text-anchor="middle">Ruby</text>
+      <circle class="tech-badge" cx="75" cy="30" r="6"/>
+    </g>
+
+    <!-- Ruby on Rails -->
+    <g class="tech-symbol" id="ruby-on-rails" data-name="Ruby on Rails" data-category="backend" data-proficiency="9" data-years="15" data-tags="framework">
+      <circle cx="150" cy="50" r="40" fill="#cc342d" opacity="0.1" stroke="#cc342d" stroke-width="2"/>
+      <text class="tech-label" x="150" y="60" text-anchor="middle">Rails</text>
+      <circle class="tech-badge" cx="175" cy="30" r="6"/>
+    </g>
+
+    <!-- Rust -->
+    <g class="tech-symbol" id="rust" data-name="Rust" data-category="backend" data-proficiency="6" data-years="3" data-tags="language">
+      <circle cx="250" cy="50" r="40" fill="#ce422b" opacity="0.1" stroke="#ce422b" stroke-width="2"/>
+      <text class="tech-label" x="250" y="60" text-anchor="middle">Rust</text>
+      <circle class="tech-badge" cx="275" cy="30" r="6"/>
+    </g>
+
+    <!-- Python -->
+    <g class="tech-symbol" id="python" data-name="Python" data-category="backend" data-proficiency="6" data-years="5" data-tags="language">
+      <circle cx="350" cy="50" r="40" fill="#3776ab" opacity="0.1" stroke="#3776ab" stroke-width="2"/>
+      <text class="tech-label" x="350" y="60" text-anchor="middle">Python</text>
+      <circle class="tech-badge" cx="375" cy="30" r="6"/>
+    </g>
+
+    <!-- PHP -->
+    <g class="tech-symbol" id="php" data-name="PHP" data-category="backend" data-proficiency="6" data-years="10" data-tags="language">
+      <circle cx="450" cy="50" r="40" fill="#777bb4" opacity="0.1" stroke="#777bb4" stroke-width="2"/>
+      <text class="tech-label" x="450" y="60" text-anchor="middle">PHP</text>
+      <circle class="tech-badge" cx="475" cy="30" r="6"/>
+    </g>
+
+    <!-- C# -->
+    <g class="tech-symbol" id="csharp" data-name="C#" data-category="backend" data-proficiency="6" data-years="3" data-tags="language">
+      <circle cx="550" cy="50" r="40" fill="#239120" opacity="0.1" stroke="#239120" stroke-width="2"/>
+      <text class="tech-label" x="550" y="60" text-anchor="middle">C#</text>
+      <circle class="tech-badge" cx="575" cy="30" r="6"/>
+    </g>
+
+    <!-- FRONTEND TECHNOLOGIES -->
+
+    <!-- JavaScript -->
+    <g class="tech-symbol" id="javascript" data-name="JavaScript" data-category="frontend" data-proficiency="9" data-years="15" data-tags="language">
+      <circle cx="50" cy="150" r="40" fill="#f7df1e" opacity="0.1" stroke="#f7df1e" stroke-width="2"/>
+      <text class="tech-label" x="50" y="160" text-anchor="middle">JavaScript</text>
+      <circle class="tech-badge" cx="75" cy="130" r="6"/>
+    </g>
+
+    <!-- TypeScript -->
+    <g class="tech-symbol" id="typescript" data-name="TypeScript" data-category="frontend" data-proficiency="7" data-years="5" data-tags="language">
+      <circle cx="150" cy="150" r="40" fill="#3178c6" opacity="0.1" stroke="#3178c6" stroke-width="2"/>
+      <text class="tech-label" x="150" y="160" text-anchor="middle">TypeScript</text>
+      <circle class="tech-badge" cx="175" cy="130" r="6"/>
+    </g>
+
+    <!-- Vue.js -->
+    <g class="tech-symbol" id="vuejs" data-name="Vue.js" data-category="frontend" data-proficiency="7" data-years="5" data-tags="framework">
+      <circle cx="250" cy="150" r="40" fill="#4fc08d" opacity="0.1" stroke="#4fc08d" stroke-width="2"/>
+      <text class="tech-label" x="250" y="160" text-anchor="middle">Vue.js</text>
+      <circle class="tech-badge" cx="275" cy="130" r="6"/>
+    </g>
+
+    <!-- React -->
+    <g class="tech-symbol" id="react" data-name="React" data-category="frontend" data-proficiency="7" data-years="5" data-tags="framework">
+      <circle cx="350" cy="150" r="40" fill="#61dafb" opacity="0.1" stroke="#61dafb" stroke-width="2"/>
+      <text class="tech-label" x="350" y="160" text-anchor="middle">React</text>
+      <circle class="tech-badge" cx="375" cy="130" r="6"/>
+    </g>
+
+    <!-- Svelte -->
+    <g class="tech-symbol" id="svelte" data-name="Svelte" data-category="frontend" data-proficiency="5" data-years="1" data-tags="framework">
+      <circle cx="450" cy="150" r="40" fill="#ff3e00" opacity="0.1" stroke="#ff3e00" stroke-width="2"/>
+      <text class="tech-label" x="450" y="160" text-anchor="middle">Svelte</text>
+      <circle class="tech-badge" cx="475" cy="130" r="6"/>
+    </g>
+
+    <!-- HTML/CSS -->
+    <g class="tech-symbol" id="html-css" data-name="HTML/CSS" data-category="frontend" data-proficiency="9" data-years="20" data-tags="language">
+      <circle cx="550" cy="150" r="40" fill="#e34c26" opacity="0.1" stroke="#e34c26" stroke-width="2"/>
+      <text class="tech-label" x="550" y="160" text-anchor="middle">HTML/CSS</text>
+      <circle class="tech-badge" cx="575" cy="130" r="6"/>
+    </g>
+
+    <!-- SASS/SCSS -->
+    <g class="tech-symbol" id="sass" data-name="SASS/SCSS" data-category="frontend" data-proficiency="8" data-years="10" data-tags="tool">
+      <circle cx="650" cy="150" r="40" fill="#c69" opacity="0.1" stroke="#c69" stroke-width="2"/>
+      <text class="tech-label" x="650" y="160" text-anchor="middle">SASS</text>
+      <circle class="tech-badge" cx="675" cy="130" r="6"/>
+    </g>
+
+    <!-- D3.js -->
+    <g class="tech-symbol" id="d3js" data-name="D3.js" data-category="frontend" data-proficiency="6" data-years="3" data-tags="visualization">
+      <circle cx="750" cy="150" r="40" fill="#f9a825" opacity="0.1" stroke="#f9a825" stroke-width="2"/>
+      <text class="tech-label" x="750" y="160" text-anchor="middle">D3.js</text>
+      <circle class="tech-badge" cx="775" cy="130" r="6"/>
+    </g>
+
+    <!-- DATABASES -->
+
+    <!-- PostgreSQL -->
+    <g class="tech-symbol" id="postgresql" data-name="PostgreSQL" data-category="database" data-proficiency="9" data-years="15" data-tags="sql">
+      <circle cx="50" cy="250" r="40" fill="#336791" opacity="0.1" stroke="#336791" stroke-width="2"/>
+      <text class="tech-label" x="50" y="260" text-anchor="middle">PostgreSQL</text>
+      <circle class="tech-badge" cx="75" cy="230" r="6"/>
+    </g>
+
+    <!-- MySQL -->
+    <g class="tech-symbol" id="mysql" data-name="MySQL" data-category="database" data-proficiency="8" data-years="15" data-tags="sql">
+      <circle cx="150" cy="250" r="40" fill="#00758f" opacity="0.1" stroke="#00758f" stroke-width="2"/>
+      <text class="tech-label" x="150" y="260" text-anchor="middle">MySQL</text>
+      <circle class="tech-badge" cx="175" cy="230" r="6"/>
+    </g>
+
+    <!-- PostGIS -->
+    <g class="tech-symbol" id="postgis" data-name="PostGIS" data-category="database" data-proficiency="7" data-years="8" data-tags="spatial,sql">
+      <circle cx="250" cy="250" r="40" fill="#336791" opacity="0.1" stroke="#336791" stroke-width="2"/>
+      <text class="tech-label" x="250" y="260" text-anchor="middle">PostGIS</text>
+      <circle class="tech-badge" cx="275" cy="230" r="6"/>
+    </g>
+
+    <!-- Redis -->
+    <g class="tech-symbol" id="redis" data-name="Redis" data-category="data" data-proficiency="7" data-years="8" data-tags="cache,nosql">
+      <circle cx="350" cy="250" r="40" fill="#dc382d" opacity="0.1" stroke="#dc382d" stroke-width="2"/>
+      <text class="tech-label" x="350" y="260" text-anchor="middle">Redis</text>
+      <circle class="tech-badge" cx="375" cy="230" r="6"/>
+    </g>
+
+    <!-- Elasticsearch -->
+    <g class="tech-symbol" id="elasticsearch" data-name="Elasticsearch" data-category="data" data-proficiency="6" data-years="5" data-tags="search,nosql">
+      <circle cx="450" cy="250" r="40" fill="#005571" opacity="0.1" stroke="#005571" stroke-width="2"/>
+      <text class="tech-label" x="450" y="260" text-anchor="middle">Elasticsearch</text>
+      <circle class="tech-badge" cx="475" cy="230" r="6"/>
+    </g>
+
+    <!-- DEVOPS -->
+
+    <!-- Docker -->
+    <g class="tech-symbol" id="docker" data-name="Docker" data-category="devops" data-proficiency="7" data-years="6" data-tags="container">
+      <circle cx="50" cy="350" r="40" fill="#2496ed" opacity="0.1" stroke="#2496ed" stroke-width="2"/>
+      <text class="tech-label" x="50" y="360" text-anchor="middle">Docker</text>
+      <circle class="tech-badge" cx="75" cy="330" r="6"/>
+    </g>
+
+    <!-- Kubernetes -->
+    <g class="tech-symbol" id="kubernetes" data-name="Kubernetes" data-category="devops" data-proficiency="5" data-years="2" data-tags="orchestration">
+      <circle cx="150" cy="350" r="40" fill="#326ce5" opacity="0.1" stroke="#326ce5" stroke-width="2"/>
+      <text class="tech-label" x="150" y="360" text-anchor="middle">Kubernetes</text>
+      <circle class="tech-badge" cx="175" cy="330" r="6"/>
+    </g>
+
+    <!-- Terraform -->
+    <g class="tech-symbol" id="terraform" data-name="Terraform" data-category="devops" data-proficiency="5" data-years="2" data-tags="iac">
+      <circle cx="250" cy="350" r="40" fill="#7b42bc" opacity="0.1" stroke="#7b42bc" stroke-width="2"/>
+      <text class="tech-label" x="250" y="360" text-anchor="middle">Terraform</text>
+      <circle class="tech-badge" cx="275" cy="330" r="6"/>
+    </g>
+
+    <!-- Git -->
+    <g class="tech-symbol" id="git" data-name="Git" data-category="devops" data-proficiency="9" data-years="15" data-tags="vcs">
+      <circle cx="350" cy="350" r="40" fill="#f1502f" opacity="0.1" stroke="#f1502f" stroke-width="2"/>
+      <text class="tech-label" x="350" y="360" text-anchor="middle">Git</text>
+      <circle class="tech-badge" cx="375" cy="330" r="6"/>
+    </g>
+
+    <!-- Linux Administration -->
+    <g class="tech-symbol" id="linux" data-name="Linux Administration" data-category="devops" data-proficiency="8" data-years="20" data-tags="sysadmin">
+      <circle cx="450" cy="350" r="40" fill="#fcc624" opacity="0.1" stroke="#fcc624" stroke-width="2"/>
+      <text class="tech-label" x="450" y="360" text-anchor="middle">Linux</text>
+      <circle class="tech-badge" cx="475" cy="330" r="6"/>
+    </g>
+
+    <!-- CLOUD -->
+
+    <!-- AWS -->
+    <g class="tech-symbol" id="aws" data-name="AWS" data-category="cloud" data-proficiency="7" data-years="6" data-tags="platform">
+      <circle cx="50" cy="450" r="40" fill="#ff9900" opacity="0.1" stroke="#ff9900" stroke-width="2"/>
+      <text class="tech-label" x="50" y="460" text-anchor="middle">AWS</text>
+      <circle class="tech-badge" cx="75" cy="430" r="6"/>
+    </g>
+
+    <!-- Google Cloud Platform -->
+    <g class="tech-symbol" id="gcp" data-name="Google Cloud Platform" data-category="cloud" data-proficiency="5" data-years="3" data-tags="platform">
+      <circle cx="150" cy="450" r="40" fill="#4285f4" opacity="0.1" stroke="#4285f4" stroke-width="2"/>
+      <text class="tech-label" x="150" y="460" text-anchor="middle">GCP</text>
+      <circle class="tech-badge" cx="175" cy="430" r="6"/>
+    </g>
+
+    <!-- Google APIs -->
+    <g class="tech-symbol" id="google-apis" data-name="Google APIs" data-category="cloud" data-proficiency="7" data-years="8" data-tags="api">
+      <circle cx="250" cy="450" r="40" fill="#4285f4" opacity="0.1" stroke="#4285f4" stroke-width="2"/>
+      <text class="tech-label" x="250" y="460" text-anchor="middle">Google APIs</text>
+      <circle class="tech-badge" cx="275" cy="430" r="6"/>
+    </g>
+
+    <!-- 3D/GRAPHICS -->
+
+    <!-- Three.js -->
+    <g class="tech-symbol" id="threejs" data-name="Three.js" data-category="3d" data-proficiency="5" data-years="2" data-tags="webgl,visualization">
+      <circle cx="50" cy="550" r="40" fill="#000000" opacity="0.1" stroke="#000000" stroke-width="2"/>
+      <text class="tech-label" x="50" y="560" text-anchor="middle">Three.js</text>
+      <circle class="tech-badge" cx="75" cy="530" r="6"/>
+    </g>
+
+    <!-- Bevy -->
+    <g class="tech-symbol" id="bevy" data-name="Bevy" data-category="3d" data-proficiency="4" data-years="1" data-tags="gamedev,rust">
+      <circle cx="150" cy="550" r="40" fill="#232326" opacity="0.1" stroke="#232326" stroke-width="2"/>
+      <text class="tech-label" x="150" y="560" text-anchor="middle">Bevy</text>
+      <circle class="tech-badge" cx="175" cy="530" r="6"/>
+    </g>
+
+    <!-- TOOLS & METHODOLOGIES -->
+
+    <!-- Test-Driven Development -->
+    <g class="tech-symbol" id="tdd" data-name="Test-Driven Development" data-category="tools" data-proficiency="9" data-years="15" data-tags="methodology">
+      <circle cx="50" cy="650" r="40" fill="#7cb342" opacity="0.1" stroke="#7cb342" stroke-width="2"/>
+      <text class="tech-label" x="50" y="660" text-anchor="middle">TDD</text>
+      <circle class="tech-badge" cx="75" cy="630" r="6"/>
+    </g>
+
+    <!-- API Design -->
+    <g class="tech-symbol" id="api-design" data-name="API Design" data-category="backend" data-proficiency="9" data-years="15" data-tags="architecture">
+      <circle cx="150" cy="650" r="40" fill="#e74c3c" opacity="0.1" stroke="#e74c3c" stroke-width="2"/>
+      <text class="tech-label" x="150" y="660" text-anchor="middle">API Design</text>
+      <circle class="tech-badge" cx="175" cy="630" r="6"/>
+    </g>
+
+    <!-- Full-Stack Development -->
+    <g class="tech-symbol" id="fullstack" data-name="Full-Stack Development" data-category="backend" data-proficiency="9" data-years="15" data-tags="specialty">
+      <circle cx="250" cy="650" r="40" fill="#e74c3c" opacity="0.1" stroke="#e74c3c" stroke-width="2"/>
+      <text class="tech-label" x="250" y="660" text-anchor="middle">Full-Stack</text>
+      <circle class="tech-badge" cx="275" cy="630" r="6"/>
+    </g>
+
+    <!-- Spatial Computing -->
+    <g class="tech-symbol" id="spatial" data-name="Spatial Computing" data-category="data" data-proficiency="7" data-years="8" data-tags="gis,specialty">
+      <circle cx="350" cy="650" r="40" fill="#9b59b6" opacity="0.1" stroke="#9b59b6" stroke-width="2"/>
+      <text class="tech-label" x="350" y="660" text-anchor="middle">Spatial</text>
+      <circle class="tech-badge" cx="375" cy="630" r="6"/>
+    </g>
+
+    <!-- Game Development -->
+    <g class="tech-symbol" id="gamedev" data-name="Game Development" data-category="3d" data-proficiency="4" data-years="2" data-tags="specialty">
+      <circle cx="450" cy="650" r="40" fill="#e91e63" opacity="0.1" stroke="#e91e63" stroke-width="2"/>
+      <text class="tech-label" x="450" y="660" text-anchor="middle">GameDev</text>
+      <circle class="tech-badge" cx="475" cy="630" r="6"/>
+    </g>
+
+  </g>
+
+</svg>
