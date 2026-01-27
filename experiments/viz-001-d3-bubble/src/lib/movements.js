@@ -86,7 +86,10 @@ export function createMovementForce(type, width, height, time) {
             }
             // Slowly change angle
             node.brownianAngle += (Math.random() - 0.5) * 0.3;
-            node.brownianSpeed = Math.max(0.5, Math.min(1.5, node.brownianSpeed + (Math.random() - 0.5) * 0.2));
+            node.brownianSpeed = Math.max(
+              0.5,
+              Math.min(1.5, node.brownianSpeed + (Math.random() - 0.5) * 0.2),
+            );
 
             const speed = node.brownianSpeed * alpha;
             node.vx += Math.cos(node.brownianAngle) * speed * 0.5;
@@ -126,8 +129,10 @@ export function createMovementForce(type, width, height, time) {
 
             // Advance orbit angle
             node.orbitAngle += 0.01 * alpha;
-            const targetX = centerX + Math.cos(node.orbitAngle) * node.orbitRadius;
-            const targetY = centerY + Math.sin(node.orbitAngle) * node.orbitRadius;
+            const targetX =
+              centerX + Math.cos(node.orbitAngle) * node.orbitRadius;
+            const targetY =
+              centerY + Math.sin(node.orbitAngle) * node.orbitRadius;
 
             // Steer toward orbit position
             node.vx += (targetX - node.x) * 0.05;
@@ -215,13 +220,3 @@ export function getBreathingCollideStrength(time) {
   // Oscillate between 0.7 and 1.0
   return 0.8 + Math.sin(time * 1.5) * 0.1;
 }
-
-export default {
-  MOVEMENT_TYPES,
-  createMovementForce,
-  getBreathingChargeStrength,
-  getBreathingCollideStrength,
-};
-```
-
-Now let me update the SkillBubbleChart to use these movement types:
