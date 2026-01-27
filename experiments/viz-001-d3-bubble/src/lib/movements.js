@@ -10,6 +10,10 @@ export const MOVEMENT_TYPES = {
     label: "Static",
     desc: "No movement, settled positions",
   },
+  gravity: {
+    label: "Gravity",
+    desc: "Physics-based with gravity, bounce, and velocity decay",
+  },
   breathing: {
     label: "Breathing",
     desc: "Gentle pulsing - repulsion force via sin wave",
@@ -56,6 +60,63 @@ export function createMovementForce(type, width, height, time, params = {}) {
       return (alpha) => {
         // No additional force
       };
+
+    case "gravity": {
+      let nodes;
+      function force(alpha) {
+        const bounciness = p.bounceRestitution;
+        const floorPosition = height * p.floorY;
+
+        for (let node of nodes) {
+          // Apply gravity (downward force)
+          node.vy += p.gravityStrength;
+
+          // Apply horizontal drift (slight turbulence for organic feel)
+          node.vx += (Math.random() - 0.5) * p.turbulence;
+
+          // Floor collision with bounce
+          const floorY = floorPosition - node.radius;
+          if (node.y > floorY) {
+            node.y = floorY;
+            // Bounce: reverse velocity with energy loss
+            if (node.vy > 0) {
+              node.vy = -node.vy * bounciness;
+              // Also add slight horizontal scatter on bounce
+              node.vx += (Math.random() - 0.5) * 2;
+            }
+          }
+
+          // Ceiling collision
+          const ceilingY = node.radius + 10;
+          if (node.y < ceilingY) {
+            node.y = ceilingY;
+            if (node.vy < 0) {
+              node.vy = -node.vy * bounciness;
+            }
+          }
+
+          // Wall collisions with bounce
+          const leftWall = node.radius + 10;
+          const rightWall = width - node.radius - 10;
+          if (node.x < leftWall) {
+            node.x = leftWall;
+            if (node.vx < 0) {
+              node.vx = -node.vx * bounciness;
+            }
+          }
+          if (node.x > rightWall) {
+            node.x = rightWall;
+            if (node.vx > 0) {
+              node.vx = -node.vx * bounciness;
+            }
+          }
+        }
+      }
+      force.initialize = function (_nodes) {
+        nodes = _nodes;
+      };
+      return force;
+    }
 
     case "breathing":
       return (alpha) => {
@@ -294,4 +355,32 @@ export function getBreathingRadiusMultiplier(time, params = {}) {
 export function getBreathingCollideStrength(time) {
   // Keep collision enforcement strong and constant
   return 1.0;
+}
+
+/**
+ * Get velocity decay for gravity mode
+ * @param {Object} params - Parameter overrides
+ * @returns {number} Velocity decay value (0-1, lower = more momentum)
+ */
+export function getGravityVelocityDecay(params = {}) {
+  const p = { ...getDefaultParams("gravity"), ...params };
+  return p.velocityDecay;
+}
+
+/**
+ * Calculate speed from velocity components
+ * @param {Object} node - Node with vx, vy properties
+ * @returns {number} Speed magnitude
+ */
+export function getNodeSpeed(node) {
+  return Math.hypot(node.vx || 0, node.vy || 0);
+}
+
+/**
+ * Get velocity angle in radians
+ * @param {Object} node - Node with vx, vy properties
+ * @returns {number} Angle in radians
+ */
+export function getNodeVelocityAngle(node) {
+  return Math.atan2(node.vy || 0, node.vx || 0);
 }

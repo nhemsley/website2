@@ -7,6 +7,8 @@
         getBreathingChargeStrength,
         getBreathingCollideStrength,
         getBreathingRadiusMultiplier,
+        getGravityVelocityDecay,
+        getNodeSpeed,
     } from "./movements.js";
 
     // Map skill names to Simple Icons slugs
@@ -189,8 +191,25 @@
             .force("x", d3.forceX(width / 2).strength(0.05))
             .force("y", d3.forceY(height / 2).strength(0.05));
 
-        // Apply charge force with breathing modulation if enabled
-        if (movementType === "breathing") {
+        // Apply velocity decay based on movement type
+        if (movementType === "gravity") {
+            const velocityDecay = getGravityVelocityDecay(movementParams);
+            simulation.velocityDecay(velocityDecay);
+            // For gravity mode, weaken centering forces to let gravity dominate
+            simulation.force(
+                "x",
+                d3
+                    .forceX(width / 2)
+                    .strength(movementParams.springStrength || 0.03),
+            );
+            simulation.force("y", null); // Remove y centering, gravity handles it
+        }
+
+        // Apply charge force based on movement type
+        if (movementType === "gravity") {
+            // Weaker charge for gravity mode - let physics handle spacing
+            simulation.force("charge", d3.forceManyBody().strength(-80));
+        } else if (movementType === "breathing") {
             const chargeStrength = getBreathingChargeStrength(
                 animationTime,
                 movementParams,
@@ -242,6 +261,9 @@
 
         simulation.on("tick", ticked);
 
+        // Create velocity trails group (rendered behind bubbles)
+        const trailsGroup = svg.append("g").attr("class", "velocity-trails");
+
         // Create bubble groups
         const bubbles = svg
             .selectAll(".bubble")
@@ -250,6 +272,23 @@
             .append("g")
             .attr("class", "bubble")
             .call(drag(simulation));
+
+        // Add velocity trail lines for gravity mode
+        if (
+            movementType === "gravity" &&
+            movementParams.showVelocity !== false
+        ) {
+            trailsGroup
+                .selectAll(".velocity-trail")
+                .data(nodes)
+                .enter()
+                .append("line")
+                .attr("class", "velocity-trail")
+                .attr("stroke", (d) => getColor(d.category))
+                .attr("stroke-opacity", 0.4)
+                .attr("stroke-width", 2)
+                .attr("stroke-linecap", "round");
+        }
 
         // Add circles
         bubbles
@@ -296,6 +335,37 @@
                 d.y = Math.max(d.radius, Math.min(height - d.radius, d.y));
                 return `translate(${d.x},${d.y})`;
             });
+
+            // Update velocity trails for gravity mode
+            if (
+                movementType === "gravity" &&
+                movementParams.showVelocity !== false
+            ) {
+                trailsGroup
+                    .selectAll(".velocity-trail")
+                    .attr("x1", (d) => d.x)
+                    .attr("y1", (d) => d.y)
+                    .attr("x2", (d) => {
+                        // Trail length based on velocity
+                        const speed = getNodeSpeed(d);
+                        const trailLength = Math.min(speed * 8, 60);
+                        return d.x - ((d.vx || 0) * trailLength) / (speed || 1);
+                    })
+                    .attr("y2", (d) => {
+                        const speed = getNodeSpeed(d);
+                        const trailLength = Math.min(speed * 8, 60);
+                        return d.y - ((d.vy || 0) * trailLength) / (speed || 1);
+                    })
+                    .attr("stroke-opacity", (d) => {
+                        // Fade trail based on speed
+                        const speed = getNodeSpeed(d);
+                        return Math.min(0.6, speed * 0.15);
+                    })
+                    .attr("stroke-width", (d) => {
+                        const speed = getNodeSpeed(d);
+                        return Math.max(1, Math.min(4, speed * 0.5));
+                    });
+            }
 
             // Apply breathing effect to radii (only for breathing mode)
             if (movementType === "breathing") {
@@ -379,8 +449,70 @@
         createChart();
     }
 
+    // Explode bubbles outward from center
+    function explode() {
+        if (!simulation) return;
+        const nodes = simulation.nodes();
+        const centerX = width / 2;
+        const centerY = height / 2;
+        for (let node of nodes) {
+            // Calculate angle from center
+            const dx = node.x - centerX;
+            const dy = node.y - centerY;
+            const angle = Math.atan2(dy, dx);
+            const force = 15 + Math.random() * 10;
+            // Add explosive velocity
+            node.vx += Math.cos(angle) * force;
+            node.vy += Math.sin(angle) * force;
+        }
+        simulation.alpha(1).restart();
+    }
+
+    // Drop all bubbles from the top with random initial velocities
+    function dropFromTop() {
+        if (!simulation) return;
+        const nodes = simulation.nodes();
+        for (let node of nodes) {
+            // Position at top with random horizontal spread
+            node.y = node.radius + 20 + Math.random() * 50;
+            node.x = node.radius + Math.random() * (width - node.radius * 2);
+            // Give random initial velocity
+            node.vx = (Math.random() - 0.5) * 5;
+            node.vy = Math.random() * 3; // Slight downward push
+        }
+        simulation.alpha(1).restart();
+    }
+
+    // Track previous movement type to detect changes
+    let prevMovementType = movementType;
+
     // Update simulation forces when movement type changes
     $: if (simulation && (movementType || movementParams)) {
+        // When switching TO gravity mode, drop bubbles from top for dramatic effect
+        if (movementType === "gravity" && prevMovementType !== "gravity") {
+            setTimeout(() => dropFromTop(), 100);
+        }
+        prevMovementType = movementType;
+
+        // Update velocity decay for gravity mode
+        if (movementType === "gravity") {
+            const velocityDecay = getGravityVelocityDecay(movementParams);
+            simulation.velocityDecay(velocityDecay);
+            simulation.force(
+                "x",
+                d3
+                    .forceX(width / 2)
+                    .strength(movementParams.springStrength || 0.03),
+            );
+            simulation.force("y", null);
+            simulation.force("charge", d3.forceManyBody().strength(-80));
+        } else {
+            // Reset to default velocity decay for other modes
+            simulation.velocityDecay(0.4);
+            simulation.force("x", d3.forceX(width / 2).strength(0.05));
+            simulation.force("y", d3.forceY(height / 2).strength(0.05));
+        }
+
         // Apply charge force with breathing modulation if enabled
         if (movementType === "breathing") {
             const chargeStrength = getBreathingChargeStrength(
@@ -453,6 +585,14 @@
                 {cat}
             </button>
         {/each}
+        {#if movementType === "gravity"}
+            <button class="filter-btn drop-btn" on:click={dropFromTop}>
+                🎯 Drop!
+            </button>
+            <button class="filter-btn explode-btn" on:click={explode}>
+                💥 Explode!
+            </button>
+        {/if}
     </div>
     <div class="chart-container" bind:this={container}></div>
 </div>
@@ -493,6 +633,30 @@
         background: var(--cat-color, #333);
         border-color: var(--cat-color, #333);
         color: white;
+    }
+
+    .drop-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+        font-weight: bold;
+    }
+
+    .drop-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .explode-btn {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-color: #f5576c;
+        color: white;
+        font-weight: bold;
+    }
+
+    .explode-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
     }
 
     .chart-container {
