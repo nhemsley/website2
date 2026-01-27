@@ -249,8 +249,11 @@
 
                 // Check if we're close enough to normal to switch to ACTIVE
                 if (Math.abs(resumeDecay - normalDecay) < 0.01) {
-                    logger.info("RESUMING complete - back to ACTIVE");
+                    logger.info("RESUMING complete - back to ACTIVE", {
+                        mouseState,
+                    });
                     mouseState = MouseState.ACTIVE;
+                    logger.info("State is now ACTIVE", { mouseState });
                     simulation.velocityDecay(normalDecay);
                 }
                 break;
@@ -264,8 +267,9 @@
             mouseState === MouseState.ACTIVE ||
             mouseState === MouseState.RESUMING
         ) {
-            logger.info("Transitioning to SLOWING");
+            logger.info("Transitioning to SLOWING", { from: mouseState });
             mouseState = MouseState.SLOWING;
+            logger.info("State is now", { mouseState });
         }
 
         // Reset timeout - will transition to PAUSED when mouse stops
@@ -273,8 +277,11 @@
 
         // After 200ms of no movement, transition to PAUSED
         mouseMoveTimeout = setTimeout(() => {
-            logger.info("Mouse stopped - transitioning to PAUSED");
+            logger.info("Mouse stopped - transitioning to PAUSED", {
+                from: mouseState,
+            });
             mouseState = MouseState.PAUSED;
+            logger.info("State is now PAUSED", { mouseState });
 
             // After pause duration, transition to RESUMING
             setTimeout(() => {
@@ -283,6 +290,7 @@
                         "Pause duration complete - transitioning to RESUMING",
                     );
                     mouseState = MouseState.RESUMING;
+                    logger.info("State is now RESUMING", { mouseState });
                     if (simulation) {
                         simulation.alpha(0.3).restart();
                     }
@@ -801,14 +809,17 @@
     </div>
     <div class="chart-container" bind:this={container}>
         <!-- State indicator for debugging -->
-        <div
-            class="state-indicator"
-            class:visible={mouseState !== MouseState.ACTIVE}
-        >
-            {mouseState === MouseState.SLOWING ? "🐌 Slowing" : ""}
-            {mouseState === MouseState.PAUSED ? "⏸️ Paused" : ""}
-            {mouseState === MouseState.RESUMING ? "▶️ Resuming" : ""}
-        </div>
+        {#if mouseState !== MouseState.ACTIVE}
+            <div class="state-indicator">
+                {#if mouseState === MouseState.SLOWING}
+                    🐌 Slowing
+                {:else if mouseState === MouseState.PAUSED}
+                    ⏸️ Paused
+                {:else if mouseState === MouseState.RESUMING}
+                    ▶️ Resuming
+                {/if}
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -890,14 +901,18 @@
         border-radius: 6px;
         font-size: 12px;
         font-weight: 600;
-        opacity: 0;
-        transition: opacity 0.3s ease;
         pointer-events: none;
         z-index: 10;
+        animation: fadeIn 0.2s ease;
     }
 
-    .state-indicator.visible {
-        opacity: 1;
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
 
     :global(.tooltip) {
