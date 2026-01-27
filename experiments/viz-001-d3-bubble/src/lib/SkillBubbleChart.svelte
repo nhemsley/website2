@@ -191,7 +191,7 @@
             .force("x", d3.forceX(width / 2).strength(0.05))
             .force("y", d3.forceY(height / 2).strength(0.05));
 
-        // Apply velocity decay based on movement type
+        // Apply velocity decay and centering forces based on movement type
         if (movementType === "gravity") {
             const velocityDecay = getGravityVelocityDecay(movementParams);
             simulation.velocityDecay(velocityDecay);
@@ -203,6 +203,16 @@
                     .strength(movementParams.springStrength || 0.03),
             );
             simulation.force("y", null); // Remove y centering, gravity handles it
+        } else if (movementType === "clustering") {
+            // Very weak centering for clustering - let categories organize naturally
+            simulation.velocityDecay(0.4);
+            simulation.force("x", d3.forceX(width / 2).strength(0.01));
+            simulation.force("y", d3.forceY(height / 2).strength(0.01));
+        } else if (movementType === "pulse") {
+            // Weak centering for pulse - let the radial movement dominate
+            simulation.velocityDecay(0.5);
+            simulation.force("x", d3.forceX(width / 2).strength(0.02));
+            simulation.force("y", d3.forceY(height / 2).strength(0.02));
         }
 
         // Apply charge force based on movement type
@@ -241,6 +251,12 @@
                 d3
                     .forceCollide((d) => (d.radius + 20) * (d.pulseScale || 1))
                     .strength(1.0),
+            );
+        } else if (movementType === "clustering" || movementType === "pulse") {
+            // Standard collide for clustering and pulse modes
+            simulation.force(
+                "collide",
+                d3.forceCollide((d) => d.radius + 20).strength(1.0),
             );
         } else {
             simulation.force(
@@ -494,7 +510,7 @@
         }
         prevMovementType = movementType;
 
-        // Update velocity decay for gravity mode
+        // Update velocity decay and centering forces based on movement type
         if (movementType === "gravity") {
             const velocityDecay = getGravityVelocityDecay(movementParams);
             simulation.velocityDecay(velocityDecay);
@@ -506,6 +522,18 @@
             );
             simulation.force("y", null);
             simulation.force("charge", d3.forceManyBody().strength(-80));
+        } else if (movementType === "clustering") {
+            // Very weak centering for clustering - let categories organize naturally
+            simulation.velocityDecay(0.4);
+            simulation.force("x", d3.forceX(width / 2).strength(0.01));
+            simulation.force("y", d3.forceY(height / 2).strength(0.01));
+            simulation.force("charge", d3.forceManyBody().strength(-150));
+        } else if (movementType === "pulse") {
+            // Weak centering for pulse - let the radial movement dominate
+            simulation.velocityDecay(0.5);
+            simulation.force("x", d3.forceX(width / 2).strength(0.02));
+            simulation.force("y", d3.forceY(height / 2).strength(0.02));
+            simulation.force("charge", d3.forceManyBody().strength(-150));
         } else {
             // Reset to default velocity decay for other modes
             simulation.velocityDecay(0.4);
@@ -513,7 +541,7 @@
             simulation.force("y", d3.forceY(height / 2).strength(0.05));
         }
 
-        // Apply charge force with breathing modulation if enabled
+        // Apply charge force with breathing modulation if enabled (skip if already set above)
         if (movementType === "breathing") {
             const chargeStrength = getBreathingChargeStrength(
                 animationTime,
@@ -541,6 +569,12 @@
                 d3
                     .forceCollide((d) => (d.radius + 20) * (d.pulseScale || 1))
                     .strength(1.0),
+            );
+        } else if (movementType === "clustering" || movementType === "pulse") {
+            // Already set charge above, just set collide
+            simulation.force(
+                "collide",
+                d3.forceCollide((d) => d.radius + 20).strength(1.0),
             );
         } else {
             simulation.force("charge", d3.forceManyBody().strength(-150));

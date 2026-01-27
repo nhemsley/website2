@@ -143,10 +143,10 @@ export const MOVEMENT_PARAMS = {
   clustering: {
     attractionStrength: {
       label: "Attraction Strength",
-      default: 0.1,
+      default: 0.3,
       min: 0.01,
-      max: 0.5,
-      step: 0.01,
+      max: 1.0,
+      step: 0.05,
       desc: "Force pulling toward cluster center",
     },
   },
@@ -154,7 +154,7 @@ export const MOVEMENT_PARAMS = {
   pulse: {
     pulseFrequency: {
       label: "Pulse Frequency",
-      default: 2.0,
+      default: 1.5,
       min: 0.5,
       max: 5.0,
       step: 0.1,
@@ -162,17 +162,17 @@ export const MOVEMENT_PARAMS = {
     },
     contractionMin: {
       label: "Minimum Contraction",
-      default: 0.7,
-      min: 0.5,
+      default: 0.6,
+      min: 0.3,
       max: 0.9,
       step: 0.05,
       desc: "Minimum distance multiplier",
     },
     movementStrength: {
       label: "Movement Strength",
-      default: 0.03,
+      default: 0.08,
       min: 0.01,
-      max: 0.1,
+      max: 0.3,
       step: 0.01,
       desc: "Force strength for pulse movement",
     },
