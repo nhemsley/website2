@@ -3,6 +3,8 @@
  * Each movement type returns a force function for d3 simulation
  */
 
+import { getDefaultParams } from "./movementParams.js";
+
 export const MOVEMENT_TYPES = {
   static: {
     label: "Static",
@@ -40,9 +42,12 @@ export const MOVEMENT_TYPES = {
  * @param {number} width - Canvas width
  * @param {number} height - Canvas height
  * @param {number} time - Current animation time
+ * @param {Object} params - Optional parameter overrides
  * @returns {Function} Force function for d3 simulation
  */
-export function createMovementForce(type, width, height, time) {
+export function createMovementForce(type, width, height, time, params = {}) {
+  // Merge provided params with defaults
+  const p = { ...getDefaultParams(type), ...params };
   const centerX = width / 2;
   const centerY = height / 2;
 
@@ -68,15 +73,20 @@ export function createMovementForce(type, width, height, time) {
             node.brownianSpeed = 2;
           }
           // Change angle more dramatically for more movement
-          node.brownianAngle += (Math.random() - 0.5) * 0.8;
+          node.brownianAngle += (Math.random() - 0.5) * p.angleVariation;
           node.brownianSpeed = Math.max(
-            1.5,
-            Math.min(4.0, node.brownianSpeed + (Math.random() - 0.5) * 0.5),
+            p.minSpeed,
+            Math.min(
+              p.maxSpeed,
+              node.brownianSpeed + (Math.random() - 0.5) * p.speedVariance,
+            ),
           );
 
           const speed = node.brownianSpeed * alpha;
-          node.vx += Math.cos(node.brownianAngle) * speed * 1.2;
-          node.vy += Math.sin(node.brownianAngle) * speed * 1.2;
+          node.vx +=
+            Math.cos(node.brownianAngle) * speed * p.intensityMultiplier;
+          node.vy +=
+            Math.sin(node.brownianAngle) * speed * p.intensityMultiplier;
         }
       }
       force.initialize = function (_nodes) {
@@ -88,20 +98,22 @@ export function createMovementForce(type, width, height, time) {
     case "randomPulse": {
       let nodes;
       function force(alpha) {
-        // Every ~60 ticks, pulse a random node
+        // Every ~N ticks, pulse a random node
         if (!window.__pulseCounter) {
           window.__pulseCounter = 0;
         }
         window.__pulseCounter++;
 
-        if (window.__pulseCounter > 60) {
+        if (window.__pulseCounter > p.pulseInterval) {
           const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
 
           // Set pulse properties
           if (!randomNode.isPulsing) {
             randomNode.isPulsing = true;
             randomNode.pulsePhase = 0;
-            randomNode.pulseTarget = 1.3 + Math.random() * 0.4; // 1.3x to 1.7x size
+            randomNode.pulseTarget =
+              p.minPulseSize +
+              Math.random() * (p.maxPulseSize - p.minPulseSize);
           }
 
           window.__pulseCounter = 0;
@@ -110,7 +122,7 @@ export function createMovementForce(type, width, height, time) {
         // Animate all pulsing nodes
         for (let node of nodes) {
           if (node.isPulsing) {
-            node.pulsePhase += 0.016; // Speed of pulse (slowed 5x)
+            node.pulsePhase += p.pulseSpeed;
 
             if (node.pulsePhase >= 1) {
               // Pulse complete
@@ -134,7 +146,7 @@ export function createMovementForce(type, width, height, time) {
                   const dx = other.x - node.x;
                   const dy = other.y - node.y;
                   const dist = Math.hypot(dx, dy);
-                  if (dist < (node.radius + other.radius) * 3) {
+                  if (dist < (node.radius + other.radius) * p.forceRadius) {
                     // Push nearby nodes away
                     other.vx += (dx / dist) * pulseForce;
                     other.vy += (dy / dist) * pulseForce;
@@ -163,15 +175,15 @@ export function createMovementForce(type, width, height, time) {
           }
 
           // Advance orbit angle
-          node.orbitAngle += 0.01 * alpha;
+          node.orbitAngle += p.orbitSpeed * alpha;
           const targetX =
             centerX + Math.cos(node.orbitAngle) * node.orbitRadius;
           const targetY =
             centerY + Math.sin(node.orbitAngle) * node.orbitRadius;
 
           // Steer toward orbit position
-          node.vx += (targetX - node.x) * 0.05;
-          node.vy += (targetY - node.y) * 0.05;
+          node.vx += (targetX - node.x) * p.steeringStrength;
+          node.vy += (targetY - node.y) * p.steeringStrength;
         }
       }
       force.initialize = function (_nodes) {
@@ -209,8 +221,8 @@ export function createMovementForce(type, width, height, time) {
           const dy = catCenter.y - node.y;
           const distance = Math.hypot(dx, dy);
           if (distance > 1) {
-            node.vx += (dx / distance) * 0.1 * alpha;
-            node.vy += (dy / distance) * 0.1 * alpha;
+            node.vx += (dx / distance) * p.attractionStrength * alpha;
+            node.vy += (dy / distance) * p.attractionStrength * alpha;
           }
         }
       }
@@ -223,18 +235,19 @@ export function createMovementForce(type, width, height, time) {
     case "pulse": {
       let nodes;
       function force(alpha) {
-        const pulsePhase = Math.sin(time * 2) * 0.5 + 0.5; // 0 to 1
+        const pulsePhase = Math.sin(time * p.pulseFrequency) * 0.5 + 0.5; // 0 to 1
         for (let node of nodes) {
           const distance = Math.hypot(node.x - centerX, node.y - centerY);
           const angle = Math.atan2(node.y - centerY, node.x - centerX);
 
           // Contract and expand
-          const targetDistance = distance * (0.7 + pulsePhase * 0.3);
+          const targetDistance =
+            distance * (p.contractionMin + pulsePhase * (1 - p.contractionMin));
           const targetX = centerX + Math.cos(angle) * targetDistance;
           const targetY = centerY + Math.sin(angle) * targetDistance;
 
-          node.vx += (targetX - node.x) * 0.03 * alpha;
-          node.vy += (targetY - node.y) * 0.03 * alpha;
+          node.vx += (targetX - node.x) * p.movementStrength * alpha;
+          node.vy += (targetY - node.y) * p.movementStrength * alpha;
         }
       }
       force.initialize = function (_nodes) {
@@ -251,24 +264,26 @@ export function createMovementForce(type, width, height, time) {
 /**
  * Get charge strength for breathing movement
  * @param {number} time - Current animation time
+ * @param {Object} params - Optional parameter overrides
  * @returns {number} Charge force multiplier
  */
-export function getBreathingChargeStrength(time) {
-  // Scale with breathing phase: radius varies ±15%, so force should scale accordingly
-  // Breathing phase oscillates between 0.85 and 1.15
-  const breathingPhase = 1 + Math.sin(time * 2) * 0.15;
-  // Base charge of -150, scaled by breathing phase squared (force ~ radius²)
-  return -150 * breathingPhase * breathingPhase;
+export function getBreathingChargeStrength(time, params = {}) {
+  const p = { ...getDefaultParams("breathing"), ...params };
+  // Scale with breathing phase: radius varies by amplitude, so force should scale accordingly
+  const breathingPhase = 1 + Math.sin(time * p.speed) * p.amplitude;
+  // Base charge scaled by breathing phase squared (force ~ radius²)
+  return p.chargeBase * breathingPhase * breathingPhase;
 }
 
 /**
  * Get breathing radius multiplier
  * @param {number} time - Current animation time
- * @returns {number} Radius multiplier (0.85 to 1.15)
+ * @param {Object} params - Optional parameter overrides
+ * @returns {number} Radius multiplier
  */
-export function getBreathingRadiusMultiplier(time) {
-  // Oscillate between 0.85 and 1.15 (±15%)
-  return 1 + Math.sin(time * 2) * 0.15;
+export function getBreathingRadiusMultiplier(time, params = {}) {
+  const p = { ...getDefaultParams("breathing"), ...params };
+  return 1 + Math.sin(time * p.speed) * p.amplitude;
 }
 
 /**

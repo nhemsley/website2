@@ -70,6 +70,7 @@
 
     // Movement type control
     export let movementType = "breathing";
+    export let movementParams = {};
 
     // Reactive: filter by category
     export let selectedCategory = null;
@@ -157,7 +158,10 @@
 
         // Apply charge force with breathing modulation if enabled
         if (movementType === "breathing") {
-            const chargeStrength = getBreathingChargeStrength(animationTime);
+            const chargeStrength = getBreathingChargeStrength(
+                animationTime,
+                movementParams,
+            );
             simulation.force(
                 "charge",
                 d3.forceManyBody().strength(chargeStrength),
@@ -168,8 +172,10 @@
 
         // Collide force with breathing effect if enabled
         if (movementType === "breathing") {
-            const breathingMultiplier =
-                getBreathingRadiusMultiplier(animationTime);
+            const breathingMultiplier = getBreathingRadiusMultiplier(
+                animationTime,
+                movementParams,
+            );
             const collideStrength = getBreathingCollideStrength(animationTime);
             simulation.force(
                 "collide",
@@ -197,6 +203,7 @@
             width,
             height,
             animationTime,
+            movementParams,
         );
         simulation.force("movement", movementForce);
 
@@ -242,8 +249,10 @@
 
             // Apply breathing effect to radii (only for breathing mode)
             if (movementType === "breathing") {
-                const breathingMultiplier =
-                    getBreathingRadiusMultiplier(animationTime);
+                const breathingMultiplier = getBreathingRadiusMultiplier(
+                    animationTime,
+                    movementParams,
+                );
                 bubbles.selectAll("circle").attr("r", (d) => {
                     return d.radius * breathingMultiplier;
                 });
@@ -321,12 +330,17 @@
     }
 
     // Update simulation forces when movement type changes
-    $: if (simulation && movementType) {
+    $: if (simulation && (movementType || movementParams)) {
         // Apply charge force with breathing modulation if enabled
         if (movementType === "breathing") {
-            const chargeStrength = getBreathingChargeStrength(animationTime);
-            const breathingMultiplier =
-                getBreathingRadiusMultiplier(animationTime);
+            const chargeStrength = getBreathingChargeStrength(
+                animationTime,
+                movementParams,
+            );
+            const breathingMultiplier = getBreathingRadiusMultiplier(
+                animationTime,
+                movementParams,
+            );
             const collideStrength = getBreathingCollideStrength(animationTime);
             simulation.force(
                 "charge",
@@ -353,11 +367,13 @@
                 d3.forceCollide((d) => d.radius + 20).strength(1.0),
             );
         }
+        // Update movement force
         const movementForce = createMovementForce(
             movementType,
             width,
             height,
             animationTime,
+            movementParams,
         );
         simulation.force("movement", movementForce);
         simulation.alpha(0.3).restart();

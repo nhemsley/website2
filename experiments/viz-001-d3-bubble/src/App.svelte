@@ -1,9 +1,23 @@
 <script>
     import SkillBubbleChart from "./lib/SkillBubbleChart.svelte";
     import { MOVEMENT_TYPES } from "./lib/movements.js";
+    import {
+        getDefaultParams,
+        getParamDefinitions,
+    } from "./lib/movementParams.js";
 
     let vizType = "bubble";
     let movementType = "breathing";
+    let movementParams = getDefaultParams(movementType);
+    let showParams = false;
+
+    // Update params when movement type changes
+    $: {
+        movementParams = getDefaultParams(movementType);
+    }
+
+    $: paramDefinitions = getParamDefinitions(movementType);
+    $: hasParams = Object.keys(paramDefinitions).length > 0;
 
     const vizTypes = [
         {
@@ -33,12 +47,9 @@
 </script>
 
 <main>
-    <h1>Skill Visualizations</h1>
-    <p>D3.js + Svelte visualization experiments</p>
-
-    <div class="selector-group">
-        <div class="viz-selector">
-            <label for="viz-type">Choose visualization:</label>
+    <div class="toolbar">
+        <div class="control-group">
+            <label for="viz-type">Visualization:</label>
             <select id="viz-type" bind:value={vizType}>
                 {#each vizTypes as viz}
                     <option value={viz.id}>{viz.label}</option>
@@ -47,28 +58,61 @@
         </div>
 
         {#if vizType === "bubble"}
-            <div class="movement-selector">
-                <label for="movement-type">Movement style:</label>
+            <div class="control-group">
+                <label for="movement-type">Movement:</label>
                 <select id="movement-type" bind:value={movementType}>
                     {#each movementTypeEntries as movement}
                         <option value={movement.id}>{movement.label}</option>
                     {/each}
                 </select>
-                <span class="movement-desc">
-                    {movementTypeEntries.find((m) => m.id === movementType)
-                        ?.desc}
-                </span>
             </div>
+
+            {#if hasParams}
+                <button
+                    class="params-toggle"
+                    on:click={() => (showParams = !showParams)}
+                    title="Adjust movement parameters"
+                >
+                    ⚙️ Parameters
+                </button>
+            {/if}
         {/if}
     </div>
 
+    {#if vizType === "bubble" && showParams && hasParams}
+        <div class="params-panel">
+            {#each Object.entries(paramDefinitions) as [key, param]}
+                <div class="param-control">
+                    <label for={key}>
+                        {param.label}
+                        <span class="param-desc">{param.desc}</span>
+                    </label>
+                    <div class="param-input-group">
+                        <input
+                            id={key}
+                            type="range"
+                            min={param.min}
+                            max={param.max}
+                            step={param.step}
+                            bind:value={movementParams[key]}
+                        />
+                        <span class="param-value">{movementParams[key]}</span>
+                    </div>
+                </div>
+            {/each}
+            <button
+                class="reset-button"
+                on:click={() =>
+                    (movementParams = getDefaultParams(movementType))}
+            >
+                Reset to Defaults
+            </button>
+        </div>
+    {/if}
+
     {#if vizType === "bubble"}
         <div class="viz-container">
-            <div class="viz-description">
-                <strong>Bubble Chart</strong> — Force-directed bubbles with interactive
-                movement. Size by proficiency, color by category.
-            </div>
-            <SkillBubbleChart {movementType} />
+            <SkillBubbleChart {movementType} {movementParams} />
         </div>
     {:else}
         <div class="viz-placeholder">
@@ -83,110 +127,78 @@
 
 <style>
     main {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
+        max-width: 100%;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
         font-family:
             system-ui,
             -apple-system,
             sans-serif;
+        display: flex;
+        flex-direction: column;
     }
 
-    h1 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 8px;
-    }
-
-    p {
-        text-align: center;
-        color: #666;
-        margin-bottom: 24px;
-    }
-
-    .selector-group {
+    .toolbar {
         display: flex;
         align-items: center;
-        justify-content: center;
         gap: 24px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-        padding: 16px;
-        background: #f9f9f9;
-        border-radius: 8px;
-        border: 1px solid #eee;
+        padding: 12px 20px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        flex-shrink: 0;
     }
 
-    .viz-selector {
+    .control-group {
         display: flex;
         align-items: center;
-        gap: 12px;
-    }
-
-    .movement-selector {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .movement-desc {
-        font-size: 12px;
-        color: #999;
-        margin-left: 8px;
-        max-width: 200px;
+        gap: 8px;
     }
 
     label {
-        font-weight: 600;
-        color: #333;
+        font-size: 14px;
+        font-weight: 500;
+        color: #555;
+        white-space: nowrap;
     }
 
     select {
-        padding: 8px 12px;
-        border: 2px solid #ddd;
-        border-radius: 6px;
+        padding: 6px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
         font-size: 14px;
         font-family: inherit;
         cursor: pointer;
-        transition: border-color 0.2s ease;
+        transition: all 0.15s ease;
         background: white;
+        min-width: 150px;
     }
 
     select:hover {
-        border-color: #999;
+        border-color: #aaa;
     }
 
     select:focus {
         outline: none;
         border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
     }
 
     .viz-container {
-        display: flex;
-        flex-direction: column;
-        height: 600px;
-        border: 1px solid #eee;
-        border-radius: 8px;
+        flex: 1;
         overflow: hidden;
         background: #fafafa;
     }
 
-    .viz-description {
-        padding: 16px;
-        border-bottom: 1px solid #eee;
-        font-size: 14px;
-        color: #666;
-        background: white;
-    }
-
     .viz-placeholder {
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 600px;
         border: 2px dashed #ddd;
+        margin: 20px;
         border-radius: 8px;
         color: #999;
     }
@@ -198,5 +210,91 @@
     .viz-placeholder strong {
         color: #333;
         font-size: 18px;
+    }
+
+    .params-toggle {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.15s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .params-toggle:hover {
+        background: #f5f5f5;
+        border-color: #aaa;
+    }
+
+    .params-panel {
+        padding: 16px 20px;
+        background: #f9f9f9;
+        border-bottom: 1px solid #e0e0e0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .param-control {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .param-control label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .param-desc {
+        font-size: 11px;
+        color: #888;
+        font-weight: 400;
+    }
+
+    .param-input-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .param-input-group input[type="range"] {
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .param-value {
+        font-size: 12px;
+        font-family: monospace;
+        color: #555;
+        min-width: 50px;
+        text-align: right;
+    }
+
+    .reset-button {
+        grid-column: 1 / -1;
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.15s ease;
+        max-width: 150px;
+    }
+
+    .reset-button:hover {
+        background: #f0f0f0;
+        border-color: #aaa;
     }
 </style>
