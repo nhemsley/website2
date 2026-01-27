@@ -806,21 +806,24 @@
                 💥 Explode!
             </button>
         {/if}
+
+        <!-- State indicator in toolbar -->
+        <div
+            class="state-badge"
+            class:active={mouseState === MouseState.ACTIVE}
+        >
+            {#if mouseState === MouseState.SLOWING}
+                🐌 Slowing
+            {:else if mouseState === MouseState.PAUSED}
+                ⏸️ Paused
+            {:else if mouseState === MouseState.RESUMING}
+                ▶️ Resuming
+            {:else}
+                ✓ Active
+            {/if}
+        </div>
     </div>
-    <div class="chart-container" bind:this={container}>
-        <!-- State indicator for debugging -->
-        {#if mouseState !== MouseState.ACTIVE}
-            <div class="state-indicator">
-                {#if mouseState === MouseState.SLOWING}
-                    🐌 Slowing
-                {:else if mouseState === MouseState.PAUSED}
-                    ⏸️ Paused
-                {:else if mouseState === MouseState.RESUMING}
-                    ▶️ Resuming
-                {/if}
-            </div>
-        {/if}
-    </div>
+    <div class="chart-container" bind:this={container}></div>
 </div>
 
 <style>
@@ -891,27 +894,39 @@
         position: relative;
     }
 
-    .state-indicator {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 12px;
+    .state-badge {
+        padding: 8px 16px;
+        border: 2px solid #ddd;
+        border-radius: 20px;
+        background: white;
+        font-size: 14px;
         font-weight: 600;
+        margin-left: auto;
+        transition: all 0.3s ease;
         pointer-events: none;
-        z-index: 10;
-        animation: fadeIn 0.2s ease;
+        user-select: none;
     }
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
+    .state-badge.active {
+        background: #2ecc71;
+        border-color: #27ae60;
+        color: white;
+    }
+
+    .state-badge:not(.active) {
+        background: #f39c12;
+        border-color: #e67e22;
+        color: white;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%,
+        100% {
             opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
         }
     }
 
