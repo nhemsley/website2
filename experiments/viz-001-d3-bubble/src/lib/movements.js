@@ -18,6 +18,10 @@ export const MOVEMENT_TYPES = {
     label: "Breathing",
     desc: "Gentle pulsing - repulsion force via sin wave",
   },
+  breathingOrbit: {
+    label: "Breathing Orbit",
+    desc: "Combined breathing pulse with orbital rotation",
+  },
   easedBrownian: {
     label: "Eased Brownian",
     desc: "Smooth flowing random walk with momentum",
@@ -123,6 +127,35 @@ export function createMovementForce(type, width, height, time, params = {}) {
         // Modulate charge force via sine wave for breathing effect
         // This will be applied to the simulation's charge force instead
       };
+
+    case "breathingOrbit": {
+      let nodes;
+      function force(alpha) {
+        for (let node of nodes) {
+          if (!node.orbitRadius) {
+            node.orbitRadius = Math.hypot(node.x - centerX, node.y - centerY);
+            node.orbitAngle = Math.atan2(node.y - centerY, node.x - centerX);
+          }
+
+          // Advance orbit angle
+          node.orbitAngle += p.orbitSpeed * alpha;
+
+          // Calculate target orbit position
+          const targetX =
+            centerX + Math.cos(node.orbitAngle) * node.orbitRadius;
+          const targetY =
+            centerY + Math.sin(node.orbitAngle) * node.orbitRadius;
+
+          // Steer toward orbit position
+          node.vx += (targetX - node.x) * p.steeringStrength;
+          node.vy += (targetY - node.y) * p.steeringStrength;
+        }
+      }
+      force.initialize = function (_nodes) {
+        nodes = _nodes;
+      };
+      return force;
+    }
 
     case "easedBrownian": {
       let nodes;

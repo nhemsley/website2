@@ -35,6 +35,49 @@ export const MOVEMENT_PARAMS = {
     },
   },
 
+  breathingOrbit: {
+    speed: {
+      label: "Breathing Speed",
+      default: 2.0,
+      min: 0.5,
+      max: 5.0,
+      step: 0.1,
+      desc: "Frequency of the breathing cycle",
+    },
+    amplitude: {
+      label: "Breathing Amplitude",
+      default: 0.15,
+      min: 0.05,
+      max: 0.3,
+      step: 0.01,
+      desc: "Size variation (±%)",
+    },
+    chargeBase: {
+      label: "Charge Strength",
+      default: -150,
+      min: -300,
+      max: -50,
+      step: 10,
+      desc: "Base repulsive force",
+    },
+    orbitSpeed: {
+      label: "Orbit Speed",
+      default: 0.01,
+      min: 0.001,
+      max: 0.05,
+      step: 0.001,
+      desc: "Angular velocity of orbit",
+    },
+    steeringStrength: {
+      label: "Steering Strength",
+      default: 0.05,
+      min: 0.01,
+      max: 0.2,
+      step: 0.01,
+      desc: "How quickly bubbles adjust course",
+    },
+  },
+
   easedBrownian: {
     angleVariation: {
       label: "Direction Change",

@@ -94,6 +94,8 @@
     let tooltip;
     let animationTime = 0;
     let animationFrameId;
+    let mouseMoving = false;
+    let mouseMoveTimeout;
 
     // Movement type control
     export let movementType = "breathing";
@@ -129,12 +131,18 @@
         createChart();
         window.addEventListener("resize", handleResize);
         startBreathingAnimation();
+        setupMouseTracking();
     });
 
     onDestroy(() => {
         if (simulation) simulation.stop();
         window.removeEventListener("resize", handleResize);
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        if (mouseMoveTimeout) clearTimeout(mouseMoveTimeout);
+        if (container) {
+            container.removeEventListener("mousemove", handleMouseMove);
+            container.removeEventListener("mouseleave", handleMouseLeave);
+        }
     });
 
     function startBreathingAnimation() {
@@ -143,6 +151,61 @@
             animationFrameId = requestAnimationFrame(animate);
         };
         animate();
+    }
+
+    function setupMouseTracking() {
+        if (!container) return;
+
+        container.addEventListener("mousemove", handleMouseMove);
+        container.addEventListener("mouseleave", handleMouseLeave);
+    }
+
+    function handleMouseMove() {
+        mouseMoving = true;
+
+        // Increase friction when mouse is moving (ease to stop)
+        if (simulation) {
+            simulation.velocityDecay(0.8); // Higher decay = more friction
+        }
+
+        // Reset timeout
+        if (mouseMoveTimeout) clearTimeout(mouseMoveTimeout);
+
+        // After 500ms of no movement, resume normal motion
+        mouseMoveTimeout = setTimeout(() => {
+            mouseMoving = false;
+            if (simulation) {
+                // Restore normal velocity decay based on movement type
+                if (movementType === "gravity") {
+                    const velocityDecay =
+                        getGravityVelocityDecay(movementParams);
+                    simulation.velocityDecay(velocityDecay);
+                } else if (movementType === "pulse") {
+                    simulation.velocityDecay(0.5);
+                } else {
+                    simulation.velocityDecay(0.4);
+                }
+                simulation.alpha(0.3).restart();
+            }
+        }, 500);
+    }
+
+    function handleMouseLeave() {
+        mouseMoving = false;
+        if (mouseMoveTimeout) clearTimeout(mouseMoveTimeout);
+
+        // Restore normal velocity decay
+        if (simulation) {
+            if (movementType === "gravity") {
+                const velocityDecay = getGravityVelocityDecay(movementParams);
+                simulation.velocityDecay(velocityDecay);
+            } else if (movementType === "pulse") {
+                simulation.velocityDecay(0.5);
+            } else {
+                simulation.velocityDecay(0.4);
+            }
+            simulation.alpha(0.3).restart();
+        }
     }
 
     function handleResize() {
@@ -219,7 +282,10 @@
         if (movementType === "gravity") {
             // Weaker charge for gravity mode - let physics handle spacing
             simulation.force("charge", d3.forceManyBody().strength(-80));
-        } else if (movementType === "breathing") {
+        } else if (
+            movementType === "breathing" ||
+            movementType === "breathingOrbit"
+        ) {
             const chargeStrength = getBreathingChargeStrength(
                 animationTime,
                 movementParams,
@@ -233,7 +299,7 @@
         }
 
         // Collide force with breathing effect if enabled
-        if (movementType === "breathing") {
+        if (movementType === "breathing" || movementType === "breathingOrbit") {
             const breathingMultiplier = getBreathingRadiusMultiplier(
                 animationTime,
                 movementParams,
@@ -383,8 +449,11 @@
                     });
             }
 
-            // Apply breathing effect to radii (only for breathing mode)
-            if (movementType === "breathing") {
+            // Apply breathing effect to radii (only for breathing modes)
+            if (
+                movementType === "breathing" ||
+                movementType === "breathingOrbit"
+            ) {
                 const breathingMultiplier = getBreathingRadiusMultiplier(
                     animationTime,
                     movementParams,
@@ -542,7 +611,7 @@
         }
 
         // Apply charge force with breathing modulation if enabled (skip if already set above)
-        if (movementType === "breathing") {
+        if (movementType === "breathing" || movementType === "breathingOrbit") {
             const chargeStrength = getBreathingChargeStrength(
                 animationTime,
                 movementParams,
