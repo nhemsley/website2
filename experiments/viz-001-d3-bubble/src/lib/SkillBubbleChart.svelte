@@ -10,6 +10,7 @@
         getGravityVelocityDecay,
         getNodeSpeed,
     } from "./movements.js";
+    import { logger } from "./logger.js";
 
     // Map skill names to Simple Icons slugs
     const iconSlugs = {
@@ -173,7 +174,7 @@
     function setupMouseTracking() {
         if (!container) return;
 
-        console.log("Setting up mouse tracking on container");
+        logger.info("Setting up mouse tracking on container");
         container.addEventListener("mousemove", handleMouseMove);
         container.addEventListener("mouseleave", handleMouseLeave);
     }
@@ -200,7 +201,7 @@
             case MouseState.ACTIVE:
                 // Normal operation - ensure decay is correct
                 if (Math.abs(currentDecay - normalDecay) > 0.01) {
-                    console.log("ACTIVE: Setting decay to", normalDecay);
+                    logger.debug("ACTIVE: Setting decay to", { normalDecay });
                     simulation.velocityDecay(normalDecay);
                 }
                 break;
@@ -212,11 +213,8 @@
                 const newDecay =
                     currentDecay + (targetDecay - currentDecay) * slowingSpeed;
                 const clampedDecay = Math.min(newDecay, pausedDecay);
-                console.log(
-                    "SLOWING: decay",
-                    currentDecay.toFixed(3),
-                    "→",
-                    clampedDecay.toFixed(3),
+                logger.debug(
+                    `SLOWING: decay ${currentDecay.toFixed(3)} → ${clampedDecay.toFixed(3)}`,
                 );
                 simulation.velocityDecay(clampedDecay);
                 break;
@@ -224,7 +222,7 @@
             case MouseState.PAUSED:
                 // Hold at high friction
                 if (Math.abs(currentDecay - pausedDecay) > 0.01) {
-                    console.log("PAUSED: Setting decay to", pausedDecay);
+                    logger.debug("PAUSED: Setting decay to", { pausedDecay });
                     simulation.velocityDecay(pausedDecay);
                 }
                 break;
@@ -234,19 +232,14 @@
                 const resumeSpeed = 0.02; // Slower resume for smooth transition
                 const resumeDecay =
                     currentDecay + (normalDecay - currentDecay) * resumeSpeed;
-                console.log(
-                    "RESUMING: decay",
-                    currentDecay.toFixed(3),
-                    "→",
-                    resumeDecay.toFixed(3),
-                    "target",
-                    normalDecay.toFixed(3),
+                logger.debug(
+                    `RESUMING: decay ${currentDecay.toFixed(3)} → ${resumeDecay.toFixed(3)} target ${normalDecay.toFixed(3)}`,
                 );
                 simulation.velocityDecay(resumeDecay);
 
                 // Check if we're close enough to normal to switch to ACTIVE
                 if (Math.abs(resumeDecay - normalDecay) < 0.01) {
-                    console.log("RESUMING complete - back to ACTIVE");
+                    logger.info("RESUMING complete - back to ACTIVE");
                     mouseState = MouseState.ACTIVE;
                     simulation.velocityDecay(normalDecay);
                 }
@@ -255,13 +248,13 @@
     }
 
     function handleMouseMove() {
-        console.log("Mouse move detected, current state:", mouseState);
+        logger.debug("Mouse move detected", { currentState: mouseState });
         // Transition to SLOWING state
         if (
             mouseState === MouseState.ACTIVE ||
             mouseState === MouseState.RESUMING
         ) {
-            console.log("Transitioning to SLOWING");
+            logger.info("Transitioning to SLOWING");
             mouseState = MouseState.SLOWING;
         }
 
@@ -270,13 +263,13 @@
 
         // After 200ms of no movement, transition to PAUSED
         mouseMoveTimeout = setTimeout(() => {
-            console.log("Mouse stopped - transitioning to PAUSED");
+            logger.info("Mouse stopped - transitioning to PAUSED");
             mouseState = MouseState.PAUSED;
 
             // After pause duration, transition to RESUMING
             setTimeout(() => {
                 if (mouseState === MouseState.PAUSED) {
-                    console.log(
+                    logger.info(
                         "Pause duration complete - transitioning to RESUMING",
                     );
                     mouseState = MouseState.RESUMING;
