@@ -783,6 +783,8 @@
 </script>
 
 <div class="chart-wrapper">
+    <!-- Commented out: Category filters and gravity buttons -->
+    <!--
     <div class="filters">
         <button
             class="filter-btn"
@@ -810,6 +812,7 @@
             </button>
         {/if}
     </div>
+    -->
     <div class="chart-container" bind:this={container}></div>
 
     <!-- Debug toolbar at bottom -->
