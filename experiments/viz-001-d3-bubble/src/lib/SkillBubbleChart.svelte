@@ -173,6 +173,7 @@
     function setupMouseTracking() {
         if (!container) return;
 
+        console.log("Setting up mouse tracking on container");
         container.addEventListener("mousemove", handleMouseMove);
         container.addEventListener("mouseleave", handleMouseLeave);
     }
@@ -193,38 +194,59 @@
 
         const normalDecay = getNormalVelocityDecay();
         const pausedDecay = 0.85; // High friction when paused
+        const currentDecay = simulation.velocityDecay();
 
         switch (mouseState) {
             case MouseState.ACTIVE:
                 // Normal operation - ensure decay is correct
-                simulation.velocityDecay(normalDecay);
+                if (Math.abs(currentDecay - normalDecay) > 0.01) {
+                    console.log("ACTIVE: Setting decay to", normalDecay);
+                    simulation.velocityDecay(normalDecay);
+                }
                 break;
 
             case MouseState.SLOWING:
                 // Mouse is moving - gradually increase friction
-                const currentDecay = simulation.velocityDecay();
                 const targetDecay = pausedDecay;
                 const slowingSpeed = 0.05; // How fast to apply friction
                 const newDecay =
                     currentDecay + (targetDecay - currentDecay) * slowingSpeed;
-                simulation.velocityDecay(Math.min(newDecay, pausedDecay));
+                const clampedDecay = Math.min(newDecay, pausedDecay);
+                console.log(
+                    "SLOWING: decay",
+                    currentDecay.toFixed(3),
+                    "→",
+                    clampedDecay.toFixed(3),
+                );
+                simulation.velocityDecay(clampedDecay);
                 break;
 
             case MouseState.PAUSED:
                 // Hold at high friction
-                simulation.velocityDecay(pausedDecay);
+                if (Math.abs(currentDecay - pausedDecay) > 0.01) {
+                    console.log("PAUSED: Setting decay to", pausedDecay);
+                    simulation.velocityDecay(pausedDecay);
+                }
                 break;
 
             case MouseState.RESUMING:
                 // Gradually decrease friction back to normal
-                const currentResume = simulation.velocityDecay();
                 const resumeSpeed = 0.02; // Slower resume for smooth transition
                 const resumeDecay =
-                    currentResume + (normalDecay - currentResume) * resumeSpeed;
+                    currentDecay + (normalDecay - currentDecay) * resumeSpeed;
+                console.log(
+                    "RESUMING: decay",
+                    currentDecay.toFixed(3),
+                    "→",
+                    resumeDecay.toFixed(3),
+                    "target",
+                    normalDecay.toFixed(3),
+                );
                 simulation.velocityDecay(resumeDecay);
 
                 // Check if we're close enough to normal to switch to ACTIVE
                 if (Math.abs(resumeDecay - normalDecay) < 0.01) {
+                    console.log("RESUMING complete - back to ACTIVE");
                     mouseState = MouseState.ACTIVE;
                     simulation.velocityDecay(normalDecay);
                 }
@@ -233,11 +255,13 @@
     }
 
     function handleMouseMove() {
+        console.log("Mouse move detected, current state:", mouseState);
         // Transition to SLOWING state
         if (
             mouseState === MouseState.ACTIVE ||
             mouseState === MouseState.RESUMING
         ) {
+            console.log("Transitioning to SLOWING");
             mouseState = MouseState.SLOWING;
         }
 
@@ -246,11 +270,15 @@
 
         // After 200ms of no movement, transition to PAUSED
         mouseMoveTimeout = setTimeout(() => {
+            console.log("Mouse stopped - transitioning to PAUSED");
             mouseState = MouseState.PAUSED;
 
             // After pause duration, transition to RESUMING
             setTimeout(() => {
                 if (mouseState === MouseState.PAUSED) {
+                    console.log(
+                        "Pause duration complete - transitioning to RESUMING",
+                    );
                     mouseState = MouseState.RESUMING;
                     if (simulation) {
                         simulation.alpha(0.3).restart();
@@ -643,9 +671,13 @@
         prevMovementType = movementType;
 
         // Update velocity decay and centering forces based on movement type
+        // BUT: Don't override if mouse pause state machine is active
         if (movementType === "gravity") {
             const velocityDecay = getGravityVelocityDecay(movementParams);
-            simulation.velocityDecay(velocityDecay);
+            // Only set decay if we're in ACTIVE state
+            if (mouseState === MouseState.ACTIVE) {
+                simulation.velocityDecay(velocityDecay);
+            }
             simulation.force(
                 "x",
                 d3
@@ -662,13 +694,17 @@
             simulation.force("charge", d3.forceManyBody().strength(-150));
         } else if (movementType === "pulse") {
             // Weak centering for pulse - let the radial movement dominate
-            simulation.velocityDecay(0.5);
+            if (mouseState === MouseState.ACTIVE) {
+                simulation.velocityDecay(0.5);
+            }
             simulation.force("x", d3.forceX(width / 2).strength(0.02));
             simulation.force("y", d3.forceY(height / 2).strength(0.02));
             simulation.force("charge", d3.forceManyBody().strength(-150));
         } else {
             // Reset to default velocity decay for other modes
-            simulation.velocityDecay(0.4);
+            if (mouseState === MouseState.ACTIVE) {
+                simulation.velocityDecay(0.4);
+            }
             simulation.force("x", d3.forceX(width / 2).strength(0.05));
             simulation.force("y", d3.forceY(height / 2).strength(0.05));
         }
