@@ -806,8 +806,12 @@
                 💥 Explode!
             </button>
         {/if}
+    </div>
+    <div class="chart-container" bind:this={container}></div>
 
-        <!-- State indicator in toolbar -->
+    <!-- Debug toolbar at bottom -->
+    <div class="debug-toolbar">
+        <div class="debug-label">Debug:</div>
         <div
             class="state-badge"
             class:active={mouseState === MouseState.ACTIVE}
@@ -822,8 +826,19 @@
                 ✓ Active
             {/if}
         </div>
+        <div class="debug-info">
+            Nodes: {simulation?.nodes()?.length || 0}
+        </div>
+        <div class="debug-info">
+            Alpha: {simulation?.alpha()?.toFixed(3) || "N/A"}
+        </div>
+        <div class="debug-info">
+            Decay: {simulation?.velocityDecay()?.toFixed(3) || "N/A"}
+        </div>
+        <div class="debug-info">
+            Time: {animationTime.toFixed(2)}
+        </div>
     </div>
-    <div class="chart-container" bind:this={container}></div>
 </div>
 
 <style>
@@ -894,14 +909,40 @@
         position: relative;
     }
 
-    .state-badge {
+    .debug-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
         padding: 8px 16px;
-        border: 2px solid #ddd;
-        border-radius: 20px;
-        background: white;
-        font-size: 14px;
+        background: rgba(0, 0, 0, 0.05);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 12px;
+    }
+
+    .debug-label {
         font-weight: 600;
-        margin-left: auto;
+        color: #666;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
+
+    .debug-info {
+        padding: 4px 10px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        font-family: "Monaco", "Courier New", monospace;
+        font-size: 11px;
+        color: #555;
+    }
+
+    .state-badge {
+        padding: 6px 14px;
+        border: 2px solid #ddd;
+        border-radius: 16px;
+        background: white;
+        font-size: 13px;
+        font-weight: 600;
         transition: all 0.3s ease;
         pointer-events: none;
         user-select: none;
