@@ -212,7 +212,7 @@
 
     .top-controls {
         position: absolute;
-        top: 16px;
+        top: 8px;
         right: 16px;
         display: flex;
         gap: 8px;
