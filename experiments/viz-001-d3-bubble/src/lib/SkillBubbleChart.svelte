@@ -9,6 +9,30 @@
         getBreathingRadiusMultiplier,
     } from "./movements.js";
 
+    // Map skill names to Simple Icons slugs
+    const iconSlugs = {
+        Rust: "rust",
+        JavaScript: "javascript",
+        TypeScript: "typescript",
+        React: "react",
+        Svelte: "svelte",
+        Vue: "vuedotjs",
+        Ruby: "ruby",
+        Python: "python",
+        PostgreSQL: "postgresql",
+        AWS: "amazonaws",
+        Docker: "docker",
+        Kubernetes: "kubernetes",
+        Terraform: "terraform",
+        "D3.js": "d3dotjs",
+        "Three.js": "threedotjs",
+        Bevy: "rust",
+        "Node.js": "nodedotjs",
+        Rails: "rubyonrails",
+        Git: "git",
+        Linux: "linux",
+    };
+
     // Sample skill data - will be props later
     export let skills = [
         { name: "Rust", category: "Backend", proficiency: 8, projects: 4 },
@@ -88,6 +112,13 @@
     function getRadius(skill) {
         // Scale radius based on proficiency (min 20, max 60)
         return 15 + skill.proficiency * 5;
+    }
+
+    function getIconSlug(skillName) {
+        return (
+            iconSlugs[skillName] ||
+            skillName.toLowerCase().replace(/[^a-z0-9]/g, "")
+        );
     }
 
     onMount(() => {
@@ -229,15 +260,20 @@
             .on("mouseover", handleMouseOver)
             .on("mouseout", handleMouseOut);
 
-        // Add labels
+        // Add SVG icons from Simple Icons
         bubbles
-            .append("text")
-            .attr("text-anchor", "middle")
-            .attr("dy", "0.35em")
-            .attr("font-size", (d) => Math.max(10, d.radius / 3))
-            .attr("fill", "white")
+            .append("image")
+            .attr(
+                "xlink:href",
+                (d) =>
+                    `https://cdn.simpleicons.org/${getIconSlug(d.name)}/white`,
+            )
+            .attr("width", (d) => Math.min(d.radius * 1.2, 48))
+            .attr("height", (d) => Math.min(d.radius * 1.2, 48))
+            .attr("x", (d) => -Math.min(d.radius * 0.6, 24))
+            .attr("y", (d) => -Math.min(d.radius * 0.6, 24))
             .attr("pointer-events", "none")
-            .text((d) => d.name);
+            .attr("opacity", 0.9);
 
         function ticked() {
             bubbles.attr("transform", (d) => {
