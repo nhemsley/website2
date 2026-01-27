@@ -30,8 +30,6 @@
         Rails: "rubyonrails",
         Git: "git",
         Linux: "linux",
-        "Amazon EC2": "cloud",
-        "Amazon S3": "cloud",
     };
 
     // Sample skill data - will be props later
@@ -118,10 +116,11 @@
     }
 
     function getIconSlug(skillName) {
-        return (
-            iconSlugs[skillName] ||
-            skillName.toLowerCase().replace(/[^a-z0-9]/g, "")
-        );
+        return iconSlugs[skillName] || null;
+    }
+
+    function hasIcon(skillName) {
+        return iconSlugs[skillName] !== undefined;
     }
 
     onMount(() => {
@@ -263,8 +262,9 @@
             .on("mouseover", handleMouseOver)
             .on("mouseout", handleMouseOut);
 
-        // Add SVG icons from Simple Icons
+        // Add SVG icons from Simple Icons for skills with icons
         bubbles
+            .filter((d) => hasIcon(d.name))
             .append("image")
             .attr(
                 "xlink:href",
@@ -277,6 +277,17 @@
             .attr("y", (d) => -Math.min(d.radius * 0.6, 24))
             .attr("pointer-events", "none")
             .attr("opacity", 0.9);
+
+        // Add text labels for skills without icons
+        bubbles
+            .filter((d) => !hasIcon(d.name))
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", "0.35em")
+            .attr("font-size", (d) => Math.max(10, d.radius / 3))
+            .attr("fill", "white")
+            .attr("pointer-events", "none")
+            .text((d) => d.name);
 
         function ticked() {
             bubbles.attr("transform", (d) => {
