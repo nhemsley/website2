@@ -161,7 +161,17 @@
 
     function startBreathingAnimation() {
         const animate = () => {
-            animationTime += 0.01;
+            // Only advance animation time when in ACTIVE or RESUMING state
+            if (
+                mouseState === MouseState.ACTIVE ||
+                mouseState === MouseState.RESUMING
+            ) {
+                animationTime += 0.01;
+            } else if (mouseState === MouseState.SLOWING) {
+                // Slow down animation time progression while slowing
+                animationTime += 0.01 * 0.5; // Half speed
+            }
+            // When PAUSED, don't increment animationTime at all
 
             // Apply state machine logic each frame
             applyMousePauseState();
