@@ -30,6 +30,8 @@
         Rails: "rubyonrails",
         Git: "git",
         Linux: "linux",
+        "Amazon EC2": "cloud",
+        "Amazon S3": "cloud",
     };
 
     // Sample skill data - will be props later
@@ -59,6 +61,8 @@
             projects: 15,
         },
         { name: "AWS", category: "Cloud", proficiency: 7, projects: 10 },
+        { name: "Amazon EC2", category: "Cloud", proficiency: 7, projects: 8 },
+        { name: "Amazon S3", category: "Cloud", proficiency: 7, projects: 8 },
         { name: "Docker", category: "DevOps", proficiency: 8, projects: 12 },
         { name: "Kubernetes", category: "DevOps", proficiency: 6, projects: 4 },
         { name: "Terraform", category: "DevOps", proficiency: 5, projects: 3 },

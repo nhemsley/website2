@@ -193,6 +193,18 @@ skills:
     years: 6
     tags: [platform]
 
+  - name: Amazon EC2
+    category: cloud
+    proficiency: 7
+    years: 6
+    tags: [compute, platform]
+
+  - name: Amazon S3
+    category: cloud
+    proficiency: 7
+    years: 6
+    tags: [storage, platform]
+
   - name: Google Cloud Platform
     category: cloud
     proficiency: 5
