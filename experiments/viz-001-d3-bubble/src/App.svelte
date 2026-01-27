@@ -10,6 +10,23 @@
     let movementType = "breathing";
     let movementParams = getDefaultParams(movementType);
     let showParams = false;
+    let showDebug = false;
+
+    // Load debug preference from localStorage
+    if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("viz-debug-mode");
+        if (stored !== null) {
+            showDebug = stored === "true";
+        }
+    }
+
+    // Toggle debug and save to localStorage
+    function toggleDebug() {
+        showDebug = !showDebug;
+        if (typeof window !== "undefined") {
+            localStorage.setItem("viz-debug-mode", showDebug.toString());
+        }
+    }
 
     // Update params when movement type changes
     $: {
@@ -47,7 +64,59 @@
 </script>
 
 <main>
+    <!-- Top-right controls -->
+    <div class="top-controls">
+        <a
+            href="https://github.com/nhemsley/website2"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="icon-btn"
+            title="View source on GitHub"
+        >
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path
+                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                />
+            </svg>
+        </a>
+        <button
+            class="icon-btn"
+            on:click={toggleDebug}
+            title="Toggle debug toolbar"
+        >
+            {#if showDebug}
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                </svg>
+            {:else}
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"
+                    />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+            {/if}
+        </button>
+    </div>
+
     <div class="toolbar">
+        <!-- Commented out: Visualization type chooser -->
+        <!--
         <div class="control-group">
             <label for="viz-type">Visualization:</label>
             <select id="viz-type" bind:value={vizType}>
@@ -56,6 +125,7 @@
                 {/each}
             </select>
         </div>
+        -->
 
         {#if vizType === "bubble"}
             <div class="control-group">
@@ -112,7 +182,7 @@
 
     {#if vizType === "bubble"}
         <div class="viz-container">
-            <SkillBubbleChart {movementType} {movementParams} />
+            <SkillBubbleChart {movementType} {movementParams} {showDebug} />
         </div>
     {:else}
         <div class="viz-placeholder">
@@ -137,6 +207,43 @@
             sans-serif;
         display: flex;
         flex-direction: column;
+        position: relative;
+    }
+
+    .top-controls {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 1000;
+    }
+
+    .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: 2px solid #ddd;
+        border-radius: 50%;
+        background: white;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon-btn:hover {
+        border-color: #333;
+        background: #f0f0f0;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .icon-btn:active {
+        transform: scale(0.95);
     }
 
     .toolbar {
