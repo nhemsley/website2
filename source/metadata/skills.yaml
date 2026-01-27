@@ -1,80 +1,266 @@
+# Skills Taxonomy with Category Color Palette
+# Categories map to visualization colors for bubble charts and other viz
+
+categories:
+  - id: frontend
+    name: Frontend
+    color: "#3498db"
+    description: "UI frameworks, client-side technologies"
+
+  - id: backend
+    name: Backend
+    color: "#e74c3c"
+    description: "Server-side languages and frameworks"
+
+  - id: devops
+    name: DevOps
+    color: "#f39c12"
+    description: "Infrastructure, deployment, orchestration"
+
+  - id: data
+    name: Data
+    color: "#9b59b6"
+    description: "Databases, data processing, analytics"
+
+  - id: 3d
+    name: 3D/Graphics
+    color: "#e91e63"
+    description: "3D graphics, game engines, visualization"
+
+  - id: tools
+    name: Tools
+    color: "#795548"
+    description: "Development tools and utilities"
+
+  - id: cloud
+    name: Cloud
+    color: "#1abc9c"
+    description: "Cloud platforms and services"
+
+  - id: database
+    name: Database
+    color: "#16a085"
+    description: "Database systems and spatial data"
+
+# Skills with proficiency, years experience, and category mapping
 skills:
-  languages:
-    - name: Ruby
-      level: advanced
-      yearsExperience: 15
-    - name: Rust
-      level: intermediate
-      yearsExperience: 3
-    - name: JavaScript
-      level: advanced
-      yearsExperience: 15
-    - name: PHP
-      level: intermediate
-      yearsExperience: 10
-    - name: Python
-      level: intermediate
-      yearsExperience: 5
-    - name: C#
-      level: intermediate
-      yearsExperience: 3
+  # Backend Languages & Frameworks
+  - name: Ruby
+    category: backend
+    proficiency: 9
+    years: 15
+    tags: [language]
 
-  frameworks:
-    - name: Ruby on Rails
-      level: advanced
-    - name: Vue.js
-      level: intermediate
-    - name: React
-      level: intermediate
-    - name: Bevy
-      level: beginner
-    - name: Three.js
-      level: beginner
+  - name: Ruby on Rails
+    category: backend
+    proficiency: 9
+    years: 15
+    tags: [framework]
 
-  databases:
-    - name: PostgreSQL
-      level: advanced
-    - name: MySQL
-      level: advanced
-    - name: PostGIS
-      level: intermediate
+  - name: Rust
+    category: backend
+    proficiency: 6
+    years: 3
+    tags: [language]
 
-  devops:
-    - name: Docker
-      level: intermediate
-    - name: Kubernetes
-      level: beginner
-    - name: AWS
-      level: intermediate
-    - name: Terraform
-      level: beginner
-    - name: Google Cloud Platform
-      level: beginner
+  - name: Python
+    category: backend
+    proficiency: 6
+    years: 5
+    tags: [language]
 
-  specialties:
-    - name: Test-Driven Development
-      level: advanced
-    - name: Full-Stack Web Development
-      level: advanced
-    - name: API Integration
-      level: advanced
-    - name: Spatial Computing / GIS
-      level: intermediate
-    - name: 3D Graphics
-      level: beginner
-    - name: Game Development
-      level: beginner
-    - name: Scientific Computing
-      level: beginner
+  - name: PHP
+    category: backend
+    proficiency: 6
+    years: 10
+    tags: [language]
 
-  other:
-    - Elasticsearch
-    - Redis
-    - Google APIs (Places, Drive, etc.)
-    - JSON APIs
-    - CSS / SASS
-    - HTML
-    - Git
-    - Linux Administration
-    - cPanel / WHM
-    - Stripe Payment Integration
+  - name: C#
+    category: backend
+    proficiency: 6
+    years: 3
+    tags: [language]
+
+  # Frontend
+  - name: JavaScript
+    category: frontend
+    proficiency: 9
+    years: 15
+    tags: [language]
+
+  - name: TypeScript
+    category: frontend
+    proficiency: 7
+    years: 5
+    tags: [language]
+
+  - name: Vue.js
+    category: frontend
+    proficiency: 7
+    years: 5
+    tags: [framework]
+
+  - name: React
+    category: frontend
+    proficiency: 7
+    years: 5
+    tags: [framework]
+
+  - name: Svelte
+    category: frontend
+    proficiency: 5
+    years: 1
+    tags: [framework]
+
+  - name: HTML/CSS
+    category: frontend
+    proficiency: 9
+    years: 20
+    tags: [language]
+
+  - name: SASS/SCSS
+    category: frontend
+    proficiency: 8
+    years: 10
+    tags: [tool]
+
+  # Databases
+  - name: PostgreSQL
+    category: database
+    proficiency: 9
+    years: 15
+    tags: [sql]
+
+  - name: MySQL
+    category: database
+    proficiency: 8
+    years: 15
+    tags: [sql]
+
+  - name: PostGIS
+    category: database
+    proficiency: 7
+    years: 8
+    tags: [spatial, sql]
+
+  - name: Redis
+    category: data
+    proficiency: 7
+    years: 8
+    tags: [cache, nosql]
+
+  - name: Elasticsearch
+    category: data
+    proficiency: 6
+    years: 5
+    tags: [search, nosql]
+
+  # DevOps
+  - name: Docker
+    category: devops
+    proficiency: 7
+    years: 6
+    tags: [container]
+
+  - name: Kubernetes
+    category: devops
+    proficiency: 5
+    years: 2
+    tags: [orchestration]
+
+  - name: Terraform
+    category: devops
+    proficiency: 5
+    years: 2
+    tags: [iac]
+
+  - name: Git
+    category: devops
+    proficiency: 9
+    years: 15
+    tags: [vcs]
+
+  - name: Linux Administration
+    category: devops
+    proficiency: 8
+    years: 20
+    tags: [sysadmin]
+
+  # Cloud
+  - name: AWS
+    category: cloud
+    proficiency: 7
+    years: 6
+    tags: [platform]
+
+  - name: Google Cloud Platform
+    category: cloud
+    proficiency: 5
+    years: 3
+    tags: [platform]
+
+  - name: Google APIs
+    category: cloud
+    proficiency: 7
+    years: 8
+    tags: [api]
+
+  # 3D/Graphics
+  - name: Three.js
+    category: 3d
+    proficiency: 5
+    years: 2
+    tags: [webgl, visualization]
+
+  - name: Bevy
+    category: 3d
+    proficiency: 4
+    years: 1
+    tags: [gamedev, rust]
+
+  - name: D3.js
+    category: frontend
+    proficiency: 6
+    years: 3
+    tags: [visualization]
+
+  # Tools & Methodologies
+  - name: Test-Driven Development
+    category: tools
+    proficiency: 9
+    years: 15
+    tags: [methodology]
+
+  - name: API Design
+    category: backend
+    proficiency: 9
+    years: 15
+    tags: [architecture]
+
+  - name: Full-Stack Development
+    category: backend
+    proficiency: 9
+    years: 15
+    tags: [specialty]
+
+  - name: Spatial Computing
+    category: data
+    proficiency: 7
+    years: 8
+    tags: [gis, specialty]
+
+  - name: Game Development
+    category: 3d
+    proficiency: 4
+    years: 2
+    tags: [specialty]
+
+# Proficiency Scale
+# 10 = Expert (can teach, architect systems, debug anything)
+# 9 = Advanced (production experience, best practices)
+# 8 = Proficient (comfortable with complex tasks)
+# 7 = Competent (can work independently)
+# 6 = Intermediate (needs occasional guidance)
+# 5 = Basic (learning, can handle simple tasks)
+# 4 = Beginner (exploring, needs support)
+# 3 = Novice (just started)
