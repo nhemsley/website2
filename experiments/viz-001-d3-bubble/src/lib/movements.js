@@ -12,17 +12,13 @@ export const MOVEMENT_TYPES = {
     label: "Breathing",
     desc: "Gentle pulsing - repulsion force via sin wave",
   },
-  brownian: {
-    label: "Brownian Motion",
-    desc: "Random walk, continuous jittery movement",
-  },
   easedBrownian: {
     label: "Eased Brownian",
-    desc: "Smoothed random walk, less jittery",
+    desc: "Smooth flowing random walk with momentum",
   },
-  randomBump: {
-    label: "Random Bump",
-    desc: "Pick a bubble, apply periodic force bump",
+  randomPulse: {
+    label: "Random Pulse",
+    desc: "Random bubbles pulse outward, pushing neighbors",
   },
   orbiting: {
     label: "Orbiting",
@@ -62,60 +58,105 @@ export function createMovementForce(type, width, height, time) {
         // This will be applied to the simulation's charge force instead
       };
 
-    case "brownian":
-      return function (alpha) {
-        // Pure random walk
-        for (let node of this.nodes()) {
-          const angle = Math.random() * Math.PI * 2;
-          const speed = 2;
-          node.vx += Math.cos(angle) * speed;
-          node.vy += Math.sin(angle) * speed;
-        }
-      };
-
-    case "easedBrownian":
-      return function (alpha) {
+    case "easedBrownian": {
+      let nodes;
+      function force(alpha) {
         // Smoothed random walk with momentum
-        for (let node of this.nodes()) {
+        for (let node of nodes) {
           if (!node.brownianAngle) {
             node.brownianAngle = Math.random() * Math.PI * 2;
-            node.brownianSpeed = 0;
+            node.brownianSpeed = 2;
           }
-          // Slowly change angle
-          node.brownianAngle += (Math.random() - 0.5) * 0.3;
+          // Change angle more dramatically for more movement
+          node.brownianAngle += (Math.random() - 0.5) * 0.8;
           node.brownianSpeed = Math.max(
-            0.5,
-            Math.min(1.5, node.brownianSpeed + (Math.random() - 0.5) * 0.2),
+            1.5,
+            Math.min(4.0, node.brownianSpeed + (Math.random() - 0.5) * 0.5),
           );
 
           const speed = node.brownianSpeed * alpha;
-          node.vx += Math.cos(node.brownianAngle) * speed * 0.5;
-          node.vy += Math.sin(node.brownianAngle) * speed * 0.5;
+          node.vx += Math.cos(node.brownianAngle) * speed * 1.2;
+          node.vy += Math.sin(node.brownianAngle) * speed * 1.2;
         }
+      }
+      force.initialize = function (_nodes) {
+        nodes = _nodes;
       };
+      return force;
+    }
 
-    case "randomBump":
-      return function (alpha) {
-        const nodes = this.nodes();
-        // Every ~30 ticks, bump a random node
-        if (!window.__bumpCounter) {
-          window.__bumpCounter = 0;
+    case "randomPulse": {
+      let nodes;
+      function force(alpha) {
+        // Every ~60 ticks, pulse a random node
+        if (!window.__pulseCounter) {
+          window.__pulseCounter = 0;
         }
-        window.__bumpCounter++;
+        window.__pulseCounter++;
 
-        if (window.__bumpCounter > 30) {
+        if (window.__pulseCounter > 60) {
           const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-          const angle = Math.random() * Math.PI * 2;
-          const bumpStrength = 3;
-          randomNode.vx += Math.cos(angle) * bumpStrength;
-          randomNode.vy += Math.sin(angle) * bumpStrength;
-          window.__bumpCounter = 0;
-        }
-      };
 
-    case "orbiting":
-      return function (alpha) {
-        for (let node of this.nodes()) {
+          // Set pulse properties
+          if (!randomNode.isPulsing) {
+            randomNode.isPulsing = true;
+            randomNode.pulsePhase = 0;
+            randomNode.pulseTarget = 1.3 + Math.random() * 0.4; // 1.3x to 1.7x size
+          }
+
+          window.__pulseCounter = 0;
+        }
+
+        // Animate all pulsing nodes
+        for (let node of nodes) {
+          if (node.isPulsing) {
+            node.pulsePhase += 0.016; // Speed of pulse (slowed 5x)
+
+            if (node.pulsePhase >= 1) {
+              // Pulse complete
+              node.isPulsing = false;
+              node.pulseScale = 1;
+            } else {
+              // Ease out: grows fast, returns slow
+              const t = node.pulsePhase;
+              const easeOut =
+                t < 0.5
+                  ? 1 + (node.pulseTarget - 1) * (1 - Math.cos(t * Math.PI))
+                  : node.pulseTarget -
+                    (node.pulseTarget - 1) * Math.sin((t - 0.5) * Math.PI);
+
+              node.pulseScale = easeOut;
+
+              // Add outward repulsive force while pulsing
+              const pulseForce = (node.pulseScale - 1) * 2;
+              for (let other of nodes) {
+                if (other !== node) {
+                  const dx = other.x - node.x;
+                  const dy = other.y - node.y;
+                  const dist = Math.hypot(dx, dy);
+                  if (dist < (node.radius + other.radius) * 3) {
+                    // Push nearby nodes away
+                    other.vx += (dx / dist) * pulseForce;
+                    other.vy += (dy / dist) * pulseForce;
+                  }
+                }
+              }
+            }
+          } else {
+            node.pulseScale = 1;
+          }
+        }
+      }
+      force.initialize = function (_nodes) {
+        nodes = _nodes;
+      };
+      return force;
+    }
+
+    case "orbiting": {
+      let nodes;
+      function force(alpha) {
+        for (let node of nodes) {
           if (!node.orbitRadius) {
             node.orbitRadius = Math.hypot(node.x - centerX, node.y - centerY);
             node.orbitAngle = Math.atan2(node.y - centerY, node.x - centerX);
@@ -132,11 +173,16 @@ export function createMovementForce(type, width, height, time) {
           node.vx += (targetX - node.x) * 0.05;
           node.vy += (targetY - node.y) * 0.05;
         }
+      }
+      force.initialize = function (_nodes) {
+        nodes = _nodes;
       };
+      return force;
+    }
 
-    case "clustering":
-      return function (alpha) {
-        const nodes = this.nodes();
+    case "clustering": {
+      let nodes;
+      function force(alpha) {
         // Cluster by category
         const categoryPositions = {};
 
@@ -167,12 +213,18 @@ export function createMovementForce(type, width, height, time) {
             node.vy += (dy / distance) * 0.1 * alpha;
           }
         }
+      }
+      force.initialize = function (_nodes) {
+        nodes = _nodes;
       };
+      return force;
+    }
 
-    case "pulse":
-      return function (alpha) {
+    case "pulse": {
+      let nodes;
+      function force(alpha) {
         const pulsePhase = Math.sin(time * 2) * 0.5 + 0.5; // 0 to 1
-        for (let node of this.nodes()) {
+        for (let node of nodes) {
           const distance = Math.hypot(node.x - centerX, node.y - centerY);
           const angle = Math.atan2(node.y - centerY, node.x - centerX);
 
@@ -184,7 +236,12 @@ export function createMovementForce(type, width, height, time) {
           node.vx += (targetX - node.x) * 0.03 * alpha;
           node.vy += (targetY - node.y) * 0.03 * alpha;
         }
+      }
+      force.initialize = function (_nodes) {
+        nodes = _nodes;
       };
+      return force;
+    }
 
     default:
       return (alpha) => {};
@@ -197,8 +254,21 @@ export function createMovementForce(type, width, height, time) {
  * @returns {number} Charge force multiplier
  */
 export function getBreathingChargeStrength(time) {
-  // Oscillate between -60 and -20 (repulsion increases/decreases)
-  return -40 + Math.sin(time * 1.5) * -20;
+  // Scale with breathing phase: radius varies ±15%, so force should scale accordingly
+  // Breathing phase oscillates between 0.85 and 1.15
+  const breathingPhase = 1 + Math.sin(time * 2) * 0.15;
+  // Base charge of -150, scaled by breathing phase squared (force ~ radius²)
+  return -150 * breathingPhase * breathingPhase;
+}
+
+/**
+ * Get breathing radius multiplier
+ * @param {number} time - Current animation time
+ * @returns {number} Radius multiplier (0.85 to 1.15)
+ */
+export function getBreathingRadiusMultiplier(time) {
+  // Oscillate between 0.85 and 1.15 (±15%)
+  return 1 + Math.sin(time * 2) * 0.15;
 }
 
 /**
@@ -207,6 +277,6 @@ export function getBreathingChargeStrength(time) {
  * @returns {number} Padding amount
  */
 export function getBreathingCollideStrength(time) {
-  // Oscillate between 0.7 and 1.0
-  return 0.8 + Math.sin(time * 1.5) * 0.1;
+  // Keep collision enforcement strong and constant
+  return 1.0;
 }

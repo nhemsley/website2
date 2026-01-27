@@ -6,6 +6,7 @@
         createMovementForce,
         getBreathingChargeStrength,
         getBreathingCollideStrength,
+        getBreathingRadiusMultiplier,
     } from "./movements.js";
 
     // Sample skill data - will be props later
@@ -162,20 +163,31 @@
                 d3.forceManyBody().strength(chargeStrength),
             );
         } else {
-            simulation.force("charge", d3.forceManyBody().strength(-60));
+            simulation.force("charge", d3.forceManyBody().strength(-150));
         }
 
         // Collide force with breathing effect if enabled
         if (movementType === "breathing") {
+            const breathingMultiplier =
+                getBreathingRadiusMultiplier(animationTime);
             const collideStrength = getBreathingCollideStrength(animationTime);
             simulation.force(
                 "collide",
-                d3.forceCollide((d) => d.radius + 8).strength(collideStrength),
+                d3
+                    .forceCollide((d) => (d.radius + 20) * breathingMultiplier)
+                    .strength(collideStrength),
+            );
+        } else if (movementType === "randomPulse") {
+            simulation.force(
+                "collide",
+                d3
+                    .forceCollide((d) => (d.radius + 20) * (d.pulseScale || 1))
+                    .strength(1.0),
             );
         } else {
             simulation.force(
                 "collide",
-                d3.forceCollide((d) => d.radius + 8).strength(0.9),
+                d3.forceCollide((d) => d.radius + 20).strength(1.0),
             );
         }
 
@@ -230,10 +242,19 @@
 
             // Apply breathing effect to radii (only for breathing mode)
             if (movementType === "breathing") {
+                const breathingMultiplier =
+                    getBreathingRadiusMultiplier(animationTime);
                 bubbles.selectAll("circle").attr("r", (d) => {
-                    const breathing = Math.sin(animationTime * 2) * 0.15;
-                    return d.radius * (1 + breathing);
+                    return d.radius * breathingMultiplier;
                 });
+            } else if (movementType === "randomPulse") {
+                // Apply pulse scale to radii
+                bubbles.selectAll("circle").attr("r", (d) => {
+                    return d.radius * (d.pulseScale || 1);
+                });
+            } else {
+                // Reset to base radius for other modes
+                bubbles.selectAll("circle").attr("r", (d) => d.radius);
             }
         }
     }
@@ -301,22 +322,35 @@
 
     // Update simulation forces when movement type changes
     $: if (simulation && movementType) {
+        // Apply charge force with breathing modulation if enabled
         if (movementType === "breathing") {
             const chargeStrength = getBreathingChargeStrength(animationTime);
+            const breathingMultiplier =
+                getBreathingRadiusMultiplier(animationTime);
+            const collideStrength = getBreathingCollideStrength(animationTime);
             simulation.force(
                 "charge",
                 d3.forceManyBody().strength(chargeStrength),
             );
-            const collideStrength = getBreathingCollideStrength(animationTime);
             simulation.force(
                 "collide",
-                d3.forceCollide((d) => d.radius + 8).strength(collideStrength),
+                d3
+                    .forceCollide((d) => (d.radius + 20) * breathingMultiplier)
+                    .strength(collideStrength),
+            );
+        } else if (movementType === "randomPulse") {
+            simulation.force("charge", d3.forceManyBody().strength(-150));
+            simulation.force(
+                "collide",
+                d3
+                    .forceCollide((d) => (d.radius + 20) * (d.pulseScale || 1))
+                    .strength(1.0),
             );
         } else {
-            simulation.force("charge", d3.forceManyBody().strength(-60));
+            simulation.force("charge", d3.forceManyBody().strength(-150));
             simulation.force(
                 "collide",
-                d3.forceCollide((d) => d.radius + 8).strength(0.9),
+                d3.forceCollide((d) => d.radius + 20).strength(1.0),
             );
         }
         const movementForce = createMovementForce(
