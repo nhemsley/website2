@@ -94,12 +94,24 @@
     let tooltip;
     let animationTime = 0;
     let animationFrameId;
-    let mouseMoving = false;
+
+    // Mouse pause state machine
+    const MouseState = {
+        ACTIVE: "active", // Normal animation speed
+        SLOWING: "slowing", // Mouse moving, increasing friction
+        PAUSED: "paused", // Mouse stopped, high friction, waiting
+        RESUMING: "resuming", // Gradually returning to normal
+    };
+    let mouseState = MouseState.ACTIVE;
     let mouseMoveTimeout;
+    let pauseResumeInterval;
 
     // Movement type control
     export let movementType = "breathing";
     export let movementParams = {};
+
+    // Configurable pause duration (seconds)
+    export let mousePauseDuration = 4.0;
 
     // Reactive: filter by category
     export let selectedCategory = null;
@@ -139,6 +151,7 @@
         window.removeEventListener("resize", handleResize);
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
         if (mouseMoveTimeout) clearTimeout(mouseMoveTimeout);
+        if (pauseResumeInterval) clearInterval(pauseResumeInterval);
         if (container) {
             container.removeEventListener("mousemove", handleMouseMove);
             container.removeEventListener("mouseleave", handleMouseLeave);
@@ -148,6 +161,10 @@
     function startBreathingAnimation() {
         const animate = () => {
             animationTime += 0.01;
+
+            // Apply state machine logic each frame
+            applyMousePauseState();
+
             animationFrameId = requestAnimationFrame(animate);
         };
         animate();
@@ -160,50 +177,96 @@
         container.addEventListener("mouseleave", handleMouseLeave);
     }
 
-    function handleMouseMove() {
-        mouseMoving = true;
+    function getNormalVelocityDecay() {
+        // Get the normal velocity decay for current movement type
+        if (movementType === "gravity") {
+            return getGravityVelocityDecay(movementParams);
+        } else if (movementType === "pulse") {
+            return 0.5;
+        } else {
+            return 0.4;
+        }
+    }
 
-        // Increase friction when mouse is moving (ease to stop)
-        if (simulation) {
-            simulation.velocityDecay(0.8); // Higher decay = more friction
+    function applyMousePauseState() {
+        if (!simulation) return;
+
+        const normalDecay = getNormalVelocityDecay();
+        const pausedDecay = 0.85; // High friction when paused
+
+        switch (mouseState) {
+            case MouseState.ACTIVE:
+                // Normal operation - ensure decay is correct
+                simulation.velocityDecay(normalDecay);
+                break;
+
+            case MouseState.SLOWING:
+                // Mouse is moving - gradually increase friction
+                const currentDecay = simulation.velocityDecay();
+                const targetDecay = pausedDecay;
+                const slowingSpeed = 0.05; // How fast to apply friction
+                const newDecay =
+                    currentDecay + (targetDecay - currentDecay) * slowingSpeed;
+                simulation.velocityDecay(Math.min(newDecay, pausedDecay));
+                break;
+
+            case MouseState.PAUSED:
+                // Hold at high friction
+                simulation.velocityDecay(pausedDecay);
+                break;
+
+            case MouseState.RESUMING:
+                // Gradually decrease friction back to normal
+                const currentResume = simulation.velocityDecay();
+                const resumeSpeed = 0.02; // Slower resume for smooth transition
+                const resumeDecay =
+                    currentResume + (normalDecay - currentResume) * resumeSpeed;
+                simulation.velocityDecay(resumeDecay);
+
+                // Check if we're close enough to normal to switch to ACTIVE
+                if (Math.abs(resumeDecay - normalDecay) < 0.01) {
+                    mouseState = MouseState.ACTIVE;
+                    simulation.velocityDecay(normalDecay);
+                }
+                break;
+        }
+    }
+
+    function handleMouseMove() {
+        // Transition to SLOWING state
+        if (
+            mouseState === MouseState.ACTIVE ||
+            mouseState === MouseState.RESUMING
+        ) {
+            mouseState = MouseState.SLOWING;
         }
 
-        // Reset timeout
+        // Reset timeout - will transition to PAUSED when mouse stops
         if (mouseMoveTimeout) clearTimeout(mouseMoveTimeout);
 
-        // After 500ms of no movement, resume normal motion
+        // After 200ms of no movement, transition to PAUSED
         mouseMoveTimeout = setTimeout(() => {
-            mouseMoving = false;
-            if (simulation) {
-                // Restore normal velocity decay based on movement type
-                if (movementType === "gravity") {
-                    const velocityDecay =
-                        getGravityVelocityDecay(movementParams);
-                    simulation.velocityDecay(velocityDecay);
-                } else if (movementType === "pulse") {
-                    simulation.velocityDecay(0.5);
-                } else {
-                    simulation.velocityDecay(0.4);
+            mouseState = MouseState.PAUSED;
+
+            // After pause duration, transition to RESUMING
+            setTimeout(() => {
+                if (mouseState === MouseState.PAUSED) {
+                    mouseState = MouseState.RESUMING;
+                    if (simulation) {
+                        simulation.alpha(0.3).restart();
+                    }
                 }
-                simulation.alpha(0.3).restart();
-            }
-        }, 500);
+            }, mousePauseDuration * 1000);
+        }, 200);
     }
 
     function handleMouseLeave() {
-        mouseMoving = false;
+        // Clear any timeouts
         if (mouseMoveTimeout) clearTimeout(mouseMoveTimeout);
 
-        // Restore normal velocity decay
+        // Immediately resume
+        mouseState = MouseState.RESUMING;
         if (simulation) {
-            if (movementType === "gravity") {
-                const velocityDecay = getGravityVelocityDecay(movementParams);
-                simulation.velocityDecay(velocityDecay);
-            } else if (movementType === "pulse") {
-                simulation.velocityDecay(0.5);
-            } else {
-                simulation.velocityDecay(0.4);
-            }
             simulation.alpha(0.3).restart();
         }
     }
@@ -697,7 +760,17 @@
             </button>
         {/if}
     </div>
-    <div class="chart-container" bind:this={container}></div>
+    <div class="chart-container" bind:this={container}>
+        <!-- State indicator for debugging -->
+        <div
+            class="state-indicator"
+            class:visible={mouseState !== MouseState.ACTIVE}
+        >
+            {mouseState === MouseState.SLOWING ? "🐌 Slowing" : ""}
+            {mouseState === MouseState.PAUSED ? "⏸️ Paused" : ""}
+            {mouseState === MouseState.RESUMING ? "▶️ Resuming" : ""}
+        </div>
+    </div>
 </div>
 
 <style>
@@ -766,6 +839,26 @@
         flex: 1;
         min-height: 400px;
         position: relative;
+    }
+
+    .state-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .state-indicator.visible {
+        opacity: 1;
     }
 
     :global(.tooltip) {
