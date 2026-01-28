@@ -1,0 +1,184 @@
+{
+  "projects": [
+    {
+      "id": "bevy-inspector",
+      "name": "bevy-inspector",
+      "owner": "rezural",
+      "url": "https://github.com/rezural/bevy-inspector",
+      "description": "Inspector tool for the Bevy game engine",
+      "languages": {
+        "Rust": 95,
+        "GLSL": 5
+      },
+      "stats": {
+        "totalCommits": 342,
+        "commitsPerMonth6m": 8.5,
+        "createdAt": "2021-06-15",
+        "lastCommitAt": "2025-01-20",
+        "stars": 156
+      },
+      "technologies": {
+        "languages": ["Rust"],
+        "frameworks": ["Bevy"],
+        "tools": ["GitHub Actions"]
+      },
+      "importance": "high",
+      "category": "gamedev"
+    },
+    {
+      "id": "fluid-state-machine",
+      "name": "fluid-state-machine",
+      "owner": "fluid-notion-systems",
+      "url": "https://github.com/fluid-notion-systems/fluid-state-machine",
+      "description": "Async state machine library for complex workflows",
+      "languages": {
+        "Rust": 88,
+        "Markdown": 12
+      },
+      "stats": {
+        "totalCommits": 287,
+        "commitsPerMonth6m": 6.2,
+        "createdAt": "2020-09-10",
+        "lastCommitAt": "2025-01-18",
+        "stars": 89
+      },
+      "technologies": {
+        "languages": ["Rust"],
+        "frameworks": ["Tokio"],
+        "tools": ["Docker", "GitHub Actions"]
+      },
+      "importance": "high",
+      "category": "infrastructure"
+    },
+    {
+      "id": "viz-001-d3-bubble",
+      "name": "viz-001-d3-bubble",
+      "owner": "nhemsley",
+      "url": "https://github.com/nhemsley/website2/tree/main/experiments/viz-001-d3-bubble",
+      "description": "Interactive d3-force bubble chart with physics simulation and breathing effects",
+      "languages": {
+        "Svelte": 45,
+        "JavaScript": 35,
+        "CSS": 20
+      },
+      "stats": {
+        "totalCommits": 67,
+        "commitsPerMonth6m": 11.2,
+        "createdAt": "2025-01-20",
+        "lastCommitAt": "2025-01-28",
+        "stars": 0
+      },
+      "technologies": {
+        "languages": ["Svelte", "JavaScript"],
+        "frameworks": ["D3.js", "Vite"],
+        "tools": ["npm"]
+      },
+      "importance": "high",
+      "category": "visualization"
+    },
+    {
+      "id": "data-pipeline-rs",
+      "name": "data-pipeline",
+      "owner": "rezural",
+      "url": "https://github.com/rezural/data-pipeline",
+      "description": "High-performance data processing pipeline with streaming support",
+      "languages": {
+        "Rust": 92,
+        "Dockerfile": 8
+      },
+      "stats": {
+        "totalCommits": 156,
+        "commitsPerMonth6m": 2.8,
+        "createdAt": "2021-03-20",
+        "lastCommitAt": "2024-11-15",
+        "stars": 34
+      },
+      "technologies": {
+        "languages": ["Rust"],
+        "frameworks": ["Tokio", "Serde"],
+        "databases": ["PostgreSQL"],
+        "tools": ["Docker", "Kubernetes"]
+      },
+      "importance": "medium",
+      "category": "data"
+    },
+    {
+      "id": "react-dashboard",
+      "name": "admin-dashboard",
+      "owner": "nhemsley",
+      "url": "https://github.com/nhemsley/admin-dashboard",
+      "description": "Full-featured admin dashboard with real-time data updates",
+      "languages": {
+        "JavaScript": 60,
+        "CSS": 25,
+        "HTML": 15
+      },
+      "stats": {
+        "totalCommits": 234,
+        "commitsPerMonth6m": 4.1,
+        "createdAt": "2020-05-10",
+        "lastCommitAt": "2024-12-05",
+        "stars": 78
+      },
+      "technologies": {
+        "languages": ["JavaScript", "React"],
+        "frameworks": ["React", "Redux"],
+        "databases": ["MongoDB"],
+        "tools": ["Webpack"]
+      },
+      "importance": "medium",
+      "category": "web"
+    },
+    {
+      "id": "cli-tool-rust",
+      "name": "cli-framework",
+      "owner": "rezural",
+      "url": "https://github.com/rezural/cli-framework",
+      "description": "Ergonomic CLI framework with built-in help and completions",
+      "languages": {
+        "Rust": 94,
+        "Shell": 6
+      },
+      "stats": {
+        "totalCommits": 98,
+        "commitsPerMonth6m": 1.5,
+        "createdAt": "2021-11-30",
+        "lastCommitAt": "2024-10-20",
+        "stars": 45
+      },
+      "technologies": {
+        "languages": ["Rust"],
+        "frameworks": ["Clap"],
+        "tools": ["Cargo"]
+      },
+      "importance": "low",
+      "category": "tools"
+    },
+    {
+      "id": "python-ml-lib",
+      "name": "tensor-tools",
+      "owner": "nhemsley",
+      "url": "https://github.com/nhemsley/tensor-tools",
+      "description": "Machine learning utilities library with PyTorch integration",
+      "languages": {
+        "Python": 85,
+        "Jupyter": 10,
+        "Markdown": 5
+      },
+      "stats": {
+        "totalCommits": 145,
+        "commitsPerMonth6m": 3.2,
+        "createdAt": "2020-08-15",
+        "lastCommitAt": "2024-11-30",
+        "stars": 56
+      },
+      "technologies": {
+        "languages": ["Python"],
+        "frameworks": ["PyTorch", "NumPy"],
+        "tools": ["Jupyter", "Docker"]
+      },
+      "importance": "medium",
+      "category": "ml"
+    }
+  ]
+}
