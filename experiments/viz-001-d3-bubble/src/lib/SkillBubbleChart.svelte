@@ -117,6 +117,9 @@
     // Debug toolbar visibility (controlled by parent)
     export let showDebug = false;
 
+    // Per-frame bubble logging
+    let enableBubbleLogging = false;
+
     // Reactive: filter by category
     export let selectedCategory = null;
 
@@ -554,6 +557,19 @@
                     });
             }
 
+            // Per-frame logging of all bubbles if enabled
+            if (enableBubbleLogging) {
+                bubbles.each((d) => {
+                    logger.debug(`${d.name}`, {
+                        x: d.x.toFixed(1),
+                        y: d.y.toFixed(1),
+                        vx: (d.vx || 0).toFixed(3),
+                        vy: (d.vy || 0).toFixed(3),
+                        speed: getNodeSpeed(d).toFixed(3),
+                    });
+                });
+            }
+
             // Apply breathing effect to radii (only for breathing modes)
             if (
                 movementType === "breathing" ||
@@ -845,6 +861,19 @@
             <div class="debug-info">
                 Time: {animationTime.toFixed(2)}
             </div>
+            <button
+                class="debug-btn"
+                class:active={enableBubbleLogging}
+                on:click={() => {
+                    enableBubbleLogging = !enableBubbleLogging;
+                    logger.info("Bubble logging toggled", {
+                        enabled: enableBubbleLogging,
+                    });
+                }}
+                title="Log each bubble per frame to console/filesystem"
+            >
+                {enableBubbleLogging ? "📝 Logging ON" : "📝 Logging OFF"}
+            </button>
         </div>
     {/if}
 </div>
@@ -977,6 +1006,34 @@
         50% {
             opacity: 0.7;
         }
+    }
+
+    .debug-btn {
+        padding: 6px 12px;
+        border: 2px solid #ddd;
+        border-radius: 14px;
+        background: white;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .debug-btn:hover {
+        border-color: #666;
+        background: #f5f5f5;
+    }
+
+    .debug-btn.active {
+        background: #ff6b6b;
+        border-color: #cc5555;
+        color: white;
+    }
+
+    .debug-btn.active:hover {
+        background: #ff5252;
+        border-color: #bb4444;
     }
 
     :global(.tooltip) {
