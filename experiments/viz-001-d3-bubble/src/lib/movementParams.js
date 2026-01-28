@@ -220,65 +220,6 @@ export const MOVEMENT_PARAMS = {
       desc: "Force strength for pulse movement",
     },
   },
-
-  gravity: {
-    velocityDecay: {
-      label: "Velocity Decay (Friction)",
-      default: 0.4,
-      min: 0.0,
-      max: 0.9,
-      step: 0.05,
-      desc: "How quickly motion slows (0 = no friction, 0.9 = heavy friction)",
-    },
-    gravityStrength: {
-      label: "Gravity Strength",
-      default: 0.15,
-      min: 0.0,
-      max: 0.5,
-      step: 0.01,
-      desc: "Downward pull force",
-    },
-    bounceRestitution: {
-      label: "Bounce Factor",
-      default: 0.6,
-      min: 0.0,
-      max: 1.0,
-      step: 0.05,
-      desc: "Energy retained on bounce (0 = no bounce, 1 = perfect bounce)",
-    },
-    floorY: {
-      label: "Floor Position (%)",
-      default: 0.85,
-      min: 0.5,
-      max: 1.0,
-      step: 0.05,
-      desc: "Where bubbles settle (% of height)",
-    },
-    springStrength: {
-      label: "Spring Strength",
-      default: 0.03,
-      min: 0.0,
-      max: 0.1,
-      step: 0.005,
-      desc: "Horizontal centering force (spring-like)",
-    },
-    showVelocity: {
-      label: "Show Velocity Trails",
-      default: true,
-      min: false,
-      max: true,
-      step: 1,
-      desc: "Visualize velocity with motion trails",
-    },
-    turbulence: {
-      label: "Turbulence",
-      default: 0.1,
-      min: 0.0,
-      max: 0.5,
-      step: 0.02,
-      desc: "Random horizontal drift (wind effect)",
-    },
-  },
 };
 
 /**

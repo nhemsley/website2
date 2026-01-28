@@ -7,7 +7,6 @@
         getBreathingChargeStrength,
         getBreathingCollideStrength,
         getBreathingRadiusMultiplier,
-        getGravityVelocityDecay,
         getNodeSpeed,
     } from "./movements.js";
     import { logger } from "./logger.js";
@@ -197,9 +196,7 @@
 
     function getNormalVelocityDecay() {
         // Get the normal velocity decay for current movement type
-        if (movementType === "gravity") {
-            return getGravityVelocityDecay(movementParams);
-        } else if (movementType === "pulse") {
+        if (movementType === "pulse") {
             return 0.5;
         } else {
             return 0.4;
@@ -363,18 +360,7 @@
             .force("y", d3.forceY(height / 2).strength(0.05));
 
         // Apply velocity decay and centering forces based on movement type
-        if (movementType === "gravity") {
-            const velocityDecay = getGravityVelocityDecay(movementParams);
-            simulation.velocityDecay(velocityDecay);
-            // For gravity mode, weaken centering forces to let gravity dominate
-            simulation.force(
-                "x",
-                d3
-                    .forceX(width / 2)
-                    .strength(movementParams.springStrength || 0.03),
-            );
-            simulation.force("y", null); // Remove y centering, gravity handles it
-        } else if (movementType === "clustering") {
+        if (movementType === "clustering") {
             // Very weak centering for clustering - let categories organize naturally
             simulation.velocityDecay(0.4);
             simulation.force("x", d3.forceX(width / 2).strength(0.01));
@@ -387,13 +373,7 @@
         }
 
         // Apply charge force based on movement type
-        if (movementType === "gravity") {
-            // Weaker charge for gravity mode - let physics handle spacing
-            simulation.force("charge", d3.forceManyBody().strength(-80));
-        } else if (
-            movementType === "breathing" ||
-            movementType === "breathingOrbit"
-        ) {
+        if (movementType === "breathing" || movementType === "breathingOrbit") {
             const chargeStrength = getBreathingChargeStrength(
                 animationTime,
                 movementParams,
@@ -463,23 +443,6 @@
             .attr("class", "bubble")
             .call(drag(simulation));
 
-        // Add velocity trail lines for gravity mode
-        if (
-            movementType === "gravity" &&
-            movementParams.showVelocity !== false
-        ) {
-            trailsGroup
-                .selectAll(".velocity-trail")
-                .data(nodes)
-                .enter()
-                .append("line")
-                .attr("class", "velocity-trail")
-                .attr("stroke", (d) => getColor(d.category))
-                .attr("stroke-opacity", 0.4)
-                .attr("stroke-width", 2)
-                .attr("stroke-linecap", "round");
-        }
-
         // Add circles
         bubbles
             .append("circle")
@@ -525,37 +488,6 @@
                 d.y = Math.max(d.radius, Math.min(height - d.radius, d.y));
                 return `translate(${d.x},${d.y})`;
             });
-
-            // Update velocity trails for gravity mode
-            if (
-                movementType === "gravity" &&
-                movementParams.showVelocity !== false
-            ) {
-                trailsGroup
-                    .selectAll(".velocity-trail")
-                    .attr("x1", (d) => d.x)
-                    .attr("y1", (d) => d.y)
-                    .attr("x2", (d) => {
-                        // Trail length based on velocity
-                        const speed = getNodeSpeed(d);
-                        const trailLength = Math.min(speed * 8, 60);
-                        return d.x - ((d.vx || 0) * trailLength) / (speed || 1);
-                    })
-                    .attr("y2", (d) => {
-                        const speed = getNodeSpeed(d);
-                        const trailLength = Math.min(speed * 8, 60);
-                        return d.y - ((d.vy || 0) * trailLength) / (speed || 1);
-                    })
-                    .attr("stroke-opacity", (d) => {
-                        // Fade trail based on speed
-                        const speed = getNodeSpeed(d);
-                        return Math.min(0.6, speed * 0.15);
-                    })
-                    .attr("stroke-width", (d) => {
-                        const speed = getNodeSpeed(d);
-                        return Math.max(1, Math.min(4, speed * 0.5));
-                    });
-            }
 
             // Per-frame logging of all bubbles if enabled
             if (enableBubbleLogging) {
@@ -694,29 +626,11 @@
 
     // Update simulation forces when movement type changes
     $: if (simulation && (movementType || movementParams)) {
-        // When switching TO gravity mode, drop bubbles from top for dramatic effect
-        if (movementType === "gravity" && prevMovementType !== "gravity") {
-            setTimeout(() => dropFromTop(), 100);
-        }
         prevMovementType = movementType;
 
         // Update velocity decay and centering forces based on movement type
         // BUT: Don't override if mouse pause state machine is active
-        if (movementType === "gravity") {
-            const velocityDecay = getGravityVelocityDecay(movementParams);
-            // Only set decay if we're in ACTIVE state
-            if (mouseState === MouseState.ACTIVE) {
-                simulation.velocityDecay(velocityDecay);
-            }
-            simulation.force(
-                "x",
-                d3
-                    .forceX(width / 2)
-                    .strength(movementParams.springStrength || 0.03),
-            );
-            simulation.force("y", null);
-            simulation.force("charge", d3.forceManyBody().strength(-80));
-        } else if (movementType === "clustering") {
+        if (movementType === "clustering") {
             // Very weak centering for clustering - let categories organize naturally
             simulation.velocityDecay(0.4);
             simulation.force("x", d3.forceX(width / 2).strength(0.01));
