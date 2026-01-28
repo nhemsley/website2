@@ -29,8 +29,12 @@ function loggingPlugin() {
                 fs.mkdirSync(logDir, { recursive: true });
               }
 
-              // Format log entry
-              const logEntry = `[${timestamp}] [${logData.level || "INFO"}] ${logData.message}\n`;
+              // Format log entry with data
+              const dataStr =
+                logData.data && Object.keys(logData.data).length > 0
+                  ? ` ${JSON.stringify(logData.data)}`
+                  : "";
+              const logEntry = `[${timestamp}] [${logData.level || "INFO"}] ${logData.message}${dataStr}\n`;
 
               // Append to log file
               fs.appendFileSync(logFile, logEntry);
